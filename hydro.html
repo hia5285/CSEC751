@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Norsk Hydro — LockerGoga Ransomware Attack (2019) · Interactive Case Study</title>
+<meta name="description" content="An interactive documentary case study of the 2019 Norsk Hydro LockerGoga ransomware attack: incident, response, business continuity, crisis management, recovery, and the PDCA continuous improvement cycle." />
+
+<style>
+/* =========================================================================
+   NORSK HYDRO — LOCKERGOGA CASE STUDY
+   Single-file interactive documentary. HTML + CSS + Vanilla JS only.
+
+   SECTION MAP
+   1. Design tokens & resets
+   2. Global typography & utilities
+   3. Fixed chrome (watermark, progress rail, chapter nav, scroll cue)
+   4. Hero
+   5. Chapter shell & reveal primitives
+   6. Chapter-specific components
+   7. Responsive rules
+   8. Reduced-motion fallbacks
+   ========================================================================= */
+
+/* ---- Ivar Hydro (local) ---- */
+@font-face {
+  font-family: 'Ivar Display Hydro';
+  src: url('ivar-font/Ivar-font/IvarDisplayHydro-Regular.ttf') format('truetype');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Ivar Text Hydro';
+  src: url('ivar-font/Ivar-font/IvarTextHydro-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Ivar Text Hydro';
+  src: url('ivar-font/Ivar-font/IvarTextHydro-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Ivar Text Hydro';
+  src: url('ivar-font/Ivar-font/IvarTextHydro-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Ivar Text Hydro';
+  src: url('ivar-font/Ivar-font/IvarTextHydro-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ---- 1. Design tokens ---- */
+:root {
+  --bg:        #090909;
+  --bg-soft:   #0d0d0d;
+  --card:      #141414;
+  --card-2:    #1a1a1a;
+  --stroke:    rgba(255,255,255,0.08);
+  --stroke-2:  rgba(255,255,255,0.14);
+
+  --accent:    #0078FF;
+  --accent-dim:#0a4d9e;
+  --success:   #00D26A;
+  --warning:   #FFA726;
+  --danger:    #FF4D4D;
+
+  --text:      #ffffff;
+  --text-70:   rgba(255,255,255,0.72);
+  --text-45:   rgba(255,255,255,0.45);
+  --text-25:   rgba(255,255,255,0.25);
+
+  --font-display: sans-serif;
+  --font-body:    sans-serif;
+
+  --shadow-soft: 0 10px 40px rgba(0,0,0,0.5);
+  --shadow-lift: 0 24px 70px rgba(0,0,0,0.6);
+  --glow-accent: 0 0 0 1px rgba(0,120,255,0.4), 0 0 40px rgba(0,120,255,0.35);
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --maxw: 1180px;
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+}
+img, svg { display: block; max-width: 100%; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+::selection { background: rgba(0,120,255,0.35); color: #fff; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #060606; }
+::-webkit-scrollbar-thumb { background: #262626; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+
+/* ---- 2. Typography & utilities ---- */
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; }
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.mono {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+.text-dim { color: var(--text-70); }
+
+/* Buttons */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem 2rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), #2b93ff);
+  box-shadow: var(--glow-accent);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease), filter 0.35s var(--ease);
+  overflow: hidden;
+}
+.btn::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(120px 60px at 50% 120%, rgba(255,255,255,0.4), transparent 70%);
+  opacity: 0; transition: opacity 0.4s;
+}
+.btn:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px rgba(0,120,255,0.6), 0 14px 50px rgba(0,120,255,0.5); }
+.btn:hover::after { opacity: 1; }
+.btn:active { transform: translateY(-1px) scale(0.99); }
+
+.btn--ghost {
+  background: transparent;
+  border: 1px solid var(--stroke-2);
+  box-shadow: none;
+  color: var(--text);
+}
+.btn--ghost:hover { border-color: var(--accent); background: rgba(0,120,255,0.08); box-shadow: none; }
+
+.btn .arrow { transition: transform 0.35s var(--ease); }
+.btn:hover .arrow { transform: translateY(3px); }
+
+/* ---- 3. Fixed chrome ---- */
+
+/* Corner watermark logo */
+.watermark {
+  position: fixed;
+  top: 22px; left: 26px;
+  z-index: 60;
+  display: flex; align-items: center; gap: 10px;
+  opacity: 0.85;
+  pointer-events: none;
+}
+.watermark .brand-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+/* Top progress bar */
+.progress-top {
+  position: fixed; top: 0; left: 0;
+  height: 3px; width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--success));
+  z-index: 80;
+  box-shadow: 0 0 12px rgba(0,120,255,0.7);
+  transition: width 0.1s linear;
+}
+
+/* Vertical chapter rail (right side) */
+.chapter-rail {
+  position: fixed;
+  right: 26px; top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+  display: flex; flex-direction: column; gap: 14px;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.chapter-rail.visible { opacity: 1; }
+.rail-dot {
+  position: relative;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  transition: all 0.35s var(--ease);
+}
+.rail-dot::before {
+  content: attr(data-label);
+  position: absolute; right: 22px; top: 50%;
+  transform: translateY(-50%) translateX(6px);
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  background: var(--card-2);
+  border: 1px solid var(--stroke);
+  border-radius: 6px;
+  color: var(--text-70);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s var(--ease);
+}
+.rail-dot:hover { background: var(--accent); transform: scale(1.3); }
+.rail-dot:hover::before { opacity: 1; transform: translateY(-50%) translateX(0); }
+.rail-dot.active {
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(0,120,255,0.2);
+  transform: scale(1.25);
+}
+
+/* ---- 4. Hero ---- */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 5rem 1.5rem;
+  overflow: hidden;
+}
+#hero-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+}
+/* Scan-line overlay */
+.hero-scanlines {
+  position: absolute; inset: 0; z-index: 1;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.03) 0px,
+    rgba(255,255,255,0.03) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  opacity: 0.5;
+}
+.hero-sweep {
+  position: absolute; left: 0; right: 0; height: 180px; z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, rgba(0,120,255,0.10), transparent);
+  animation: sweep 7s linear infinite;
+}
+@keyframes sweep { 0% { top: -20%; } 100% { top: 120%; } }
+
+.hero-vignette {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(9,9,9,0.75) 100%);
+}
+
+.hero-inner {
+  position: relative; z-index: 2;
+  max-width: 820px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.hero-logo {
+  margin-bottom: 2rem;
+  animation: floatY 6s ease-in-out infinite;
+}
+@keyframes floatY { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+.hero h1 {
+  font-size: clamp(2.6rem, 7vw, 5.4rem);
+  background: linear-gradient(180deg, #fff 40%, rgba(255,255,255,0.55));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero .subtitle {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  color: var(--accent);
+  margin-top: 0.4rem;
+  letter-spacing: 0.01em;
+}
+.hero .tagline {
+  color: var(--text-70);
+  font-size: clamp(1rem, 1.6vw, 1.15rem);
+  margin-top: 0.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Hero info card */
+.hero-card {
+  margin-top: 2.4rem;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  background: rgba(20,20,20,0.65);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lift);
+}
+.hero-card .cell {
+  padding: 1.3rem 1.8rem;
+  text-align: left;
+  border-right: 1px solid var(--stroke);
+}
+.hero-card .cell:last-child { border-right: none; }
+.hero-card .k {
+  font-family: var(--font-display);
+  font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--text-45);
+  margin-bottom: 0.35rem;
+}
+.hero-card .v { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
+.hero-card .v.danger { color: var(--danger); }
+
+.hero-cta { margin-top: 2.6rem; }
+
+.scroll-cue {
+  position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+  z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: var(--text-45);
+  font-size: 0.72rem; letter-spacing: 0.24em; text-transform: uppercase;
+  animation: floatY 2.6s ease-in-out infinite;
+}
+.scroll-cue .mouse {
+  width: 22px; height: 36px; border: 2px solid var(--text-25); border-radius: 12px;
+  position: relative;
+}
+.scroll-cue .mouse::after {
+  content: ""; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+  width: 3px; height: 7px; background: var(--accent); border-radius: 3px;
+  animation: wheel 1.6s infinite;
+}
+@keyframes wheel { 0% { opacity: 0; top: 6px; } 40% { opacity: 1; } 80% { opacity: 0; top: 16px; } }
+
+/* ---- 5. Chapter shell ---- */
+.chapter {
+  position: relative;
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 7rem 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+.chapter-wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; }
+
+.chapter-head { margin-bottom: 2.6rem; max-width: 780px; }
+.chapter-num {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: 0.85rem; letter-spacing: 0.3em;
+  color: var(--accent);
+  display: inline-flex; align-items: center; gap: 12px;
+  margin-bottom: 1rem;
+}
+.chapter-num::before {
+  content: ""; width: 34px; height: 2px; background: var(--accent); display: inline-block;
+}
+.chapter-question {
+  font-size: clamp(1.9rem, 4.6vw, 3.4rem);
+  line-height: 1.08;
+}
+.chapter-sub { color: var(--text-70); font-size: 1.1rem; margin-top: 1rem; max-width: 640px; }
+
+/* Reveal-on-scroll primitive */
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+.reveal.d1 { transition-delay: 0.1s; }
+.reveal.d2 { transition-delay: 0.2s; }
+.reveal.d3 { transition-delay: 0.3s; }
+.reveal.d4 { transition-delay: 0.4s; }
+
+/* Generic card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+/* ---- 6a. Chapter 1 — Incident ---- */
+.c1-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 3rem; align-items: center; }
+
+.factory-silhouette {
+  position: relative;
+  aspect-ratio: 4/3;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--stroke);
+  background: linear-gradient(180deg, #0f1216, #070808);
+}
+.factory-silhouette svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.factory-silhouette .blur-layer {
+  filter: blur(14px);
+  transition: filter 1.2s var(--ease), opacity 1.2s;
+}
+.factory-silhouette.revealed .blur-layer { filter: blur(0); }
+.factory-silhouette .redline {
+  position: absolute; left: 0; right: 0; top: 0; height: 2px;
+  background: var(--danger); box-shadow: 0 0 14px var(--danger);
+  animation: scanDown 4s linear infinite;
+  opacity: 0.7;
+}
+@keyframes scanDown { 0% { top: 0; } 100% { top: 100%; } }
+.factory-tag {
+  position: absolute; bottom: 14px; left: 14px;
+  font-family: var(--font-display); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text-45);
+  background: rgba(0,0,0,0.4); padding: 6px 10px; border-radius: 6px;
+}
+
+.incident-points { list-style: none; display: flex; flex-direction: column; gap: 1rem; margin-top: 1.6rem; }
+.incident-points li {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 1.1rem 1.3rem;
+  background: var(--card); border: 1px solid var(--stroke); border-left: 3px solid var(--danger);
+  border-radius: 12px;
+  opacity: 0; transform: translateX(-24px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+.incident-points li.show { opacity: 1; transform: none; }
+.incident-points .dot { color: var(--danger); font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+.incident-points .txt strong { display: block; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
+.incident-points .txt span { color: var(--text-70); font-size: 0.92rem; }
+
+/* Infected computers illustration */
+.infected-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 1.6rem; }
+.pc {
+  aspect-ratio: 1; border-radius: 12px; border: 1px solid var(--stroke);
+  background: var(--card-2);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  transition: all 0.5s var(--ease);
+}
+.pc svg { width: 46%; opacity: 0.5; transition: all 0.5s; }
+.pc.infected { border-color: var(--danger); box-shadow: 0 0 24px rgba(255,77,77,0.35); }
+.pc.infected svg { opacity: 1; }
+.pc .lock { position: absolute; font-size: 1.4rem; opacity: 0; transform: scale(0.4); transition: all 0.5s var(--ease); }
+.pc.infected .lock { opacity: 1; transform: scale(1); }
+
+/* ---- 6b. Chapter 2 — Timeline ---- */
+.timeline { position: relative; margin-top: 1rem; padding-left: 8px; }
+.timeline-line {
+  position: absolute; left: 21px; top: 6px; bottom: 6px; width: 2px;
+  background: var(--stroke-2);
+}
+.timeline-line .fill {
+  position: absolute; top: 0; left: 0; width: 100%; height: 0%;
+  background: linear-gradient(180deg, var(--accent), var(--success));
+  transition: height 0.8s var(--ease);
+  box-shadow: 0 0 12px rgba(0,120,255,0.6);
+}
+.tl-event {
+  position: relative;
+  display: flex; gap: 22px;
+  padding: 0 0 2rem 0;
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+.tl-event.show { opacity: 1; transform: none; }
+.tl-node {
+  flex: 0 0 44px; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--card-2); border: 2px solid var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 0.7rem;
+  color: var(--accent); z-index: 2;
+  box-shadow: 0 0 0 6px rgba(9,9,9,1);
+}
+.tl-body {
+  flex: 1;
+  background: var(--card); border: 1px solid var(--stroke);
+  border-radius: 14px; padding: 1.1rem 1.4rem;
+  cursor: pointer; transition: border-color 0.3s, transform 0.3s var(--ease);
+}
+.tl-body:hover { border-color: var(--accent); transform: translateX(4px); }
+.tl-time { font-family: var(--font-display); font-weight: 700; color: var(--accent); font-size: 0.8rem; letter-spacing: 0.08em; }
+.tl-title { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; margin: 2px 0; display: flex; align-items: center; justify-content: space-between; }
+.tl-title .chev { font-size: 0.9rem; color: var(--text-45); transition: transform 0.4s var(--ease); }
+.tl-body.open .chev { transform: rotate(180deg); }
+.tl-detail { max-height: 0; overflow: hidden; transition: max-height 0.5s var(--ease), margin 0.5s var(--ease); color: var(--text-70); }
+.tl-body.open .tl-detail { max-height: 220px; margin-top: 0.6rem; }
+
+/* ---- 6c. Chapter 3 — Flip cards ---- */
+.flip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; }
+.flip {
+  perspective: 1400px; height: 360px; cursor: pointer;
+}
+.flip-inner {
+  position: relative; width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.8s var(--ease);
+}
+.flip.flipped .flip-inner { transform: rotateY(180deg); }
+.flip-face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  border-radius: 18px;
+  border: 1px solid var(--stroke);
+  padding: 1.8rem;
+  display: flex; flex-direction: column;
+}
+.flip-front {
+  background: linear-gradient(160deg, var(--card-2), var(--card));
+  align-items: center; justify-content: center; text-align: center; gap: 1rem;
+}
+.flip-front .icon {
+  width: 66px; height: 66px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,120,255,0.12); border: 1px solid rgba(0,120,255,0.3);
+  color: var(--accent);
+}
+.flip-front h3 { font-size: 1.35rem; }
+.flip-front .hint { color: var(--text-45); font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; margin-top: auto; }
+.flip-back {
+  background: linear-gradient(160deg, #10233f, var(--card));
+  transform: rotateY(180deg);
+  border-color: rgba(0,120,255,0.35);
+  justify-content: center;
+}
+.flip-back h3 { color: var(--accent); font-size: 1.15rem; margin-bottom: 0.7rem; }
+.flip-back p { color: var(--text-70); font-size: 0.95rem; }
+.flip-back .back-hint { margin-top: auto; color: var(--text-45); font-size: 0.75rem; }
+
+/* ---- 6d. Chapter 4 — Factory hotspots ---- */
+.factory-stage {
+  position: relative;
+  border-radius: 20px; overflow: hidden;
+  border: 1px solid var(--stroke);
+  background: #060809;
+  aspect-ratio: 3/2;
+}
+.factory-stage .plant-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.hotspot {
+  position: absolute; width: 30px; height: 30px; border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--accent); border: 3px solid rgba(255,255,255,0.85);
+  box-shadow: 0 0 0 6px rgba(0,120,255,0.25);
+  cursor: pointer; z-index: 3;
+}
+.hotspot::after {
+  content: ""; position: absolute; inset: -3px; border-radius: 50%;
+  border: 2px solid var(--accent);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.6); opacity: 0; } }
+.hotspot .hs-label {
+  position: absolute; left: 50%; top: -32px; transform: translateX(-50%);
+  white-space: nowrap; font-family: var(--font-display); font-weight: 600; font-size: 0.75rem;
+  background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 6px; color: #fff;
+}
+
+.hs-panel {
+  position: absolute; inset: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(6,6,6,0.72); backdrop-filter: blur(6px);
+  opacity: 0; pointer-events: none; transition: opacity 0.4s;
+}
+.hs-panel.open { opacity: 1; pointer-events: auto; }
+.hs-panel .panel-card {
+  width: min(560px, 90%);
+  background: var(--card); border: 1px solid rgba(0,120,255,0.35);
+  border-radius: 18px; padding: 2rem;
+  box-shadow: var(--shadow-lift);
+  transform: translateY(20px) scale(0.96); transition: transform 0.5s var(--ease);
+}
+.hs-panel.open .panel-card { transform: none; }
+.panel-card .p-icon { color: var(--accent); margin-bottom: 0.8rem; }
+.panel-card h3 { font-size: 1.5rem; margin-bottom: 0.6rem; }
+.panel-card p { color: var(--text-70); }
+.panel-close {
+  position: absolute; top: 16px; right: 18px;
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid var(--stroke-2); color: var(--text-70);
+  display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  transition: all 0.3s;
+}
+.panel-close:hover { border-color: var(--danger); color: var(--danger); }
+
+/* ---- 6e. Chapter 5 — Org chart ---- */
+.org { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.org-level { display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: center; }
+.org-connector { width: 2px; height: 40px; background: var(--stroke-2); position: relative; }
+.org-connector.on { background: linear-gradient(180deg, var(--accent), transparent); }
+.org-node {
+  background: var(--card); border: 1px solid var(--stroke);
+  border-radius: 14px; padding: 1.1rem 1.3rem; min-width: 200px; max-width: 260px;
+  cursor: pointer; transition: all 0.4s var(--ease);
+  text-align: left;
+}
+.org-node:hover { border-color: var(--accent); transform: translateY(-3px); }
+.org-node.ceo { border-color: rgba(0,120,255,0.5); box-shadow: var(--glow-accent); }
+.org-node .role { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+.org-node .dept { color: var(--accent); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 0.35rem; }
+.org-node .detail { max-height: 0; overflow: hidden; transition: max-height 0.5s var(--ease), margin 0.5s; }
+.org-node.open .detail { max-height: 340px; margin-top: 0.8rem; }
+.org-node .detail dl { display: grid; gap: 0.6rem; }
+.org-node .detail dt { font-family: var(--font-display); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-45); }
+.org-node .detail dd { color: var(--text-70); font-size: 0.9rem; }
+.org-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; height: 0; overflow: hidden; transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+.org-hidden.shown { opacity: 1; transform: none; pointer-events: auto; height: auto; }
+.org-expand-hint { color: var(--text-45); font-size: 0.85rem; margin-top: 1.4rem; text-align: center; }
+
+/* ---- 6f. Chapter 6 — PDCA wheel ---- */
+.pdca-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+.pdca-wheel-wrap { display: flex; justify-content: center; }
+.pdca-wheel { position: relative; width: 380px; height: 380px; max-width: 100%; }
+.pdca-wheel svg { width: 100%; height: 100%; transition: transform 1s var(--ease); }
+.pdca-seg { fill: var(--card-2); stroke: var(--bg); stroke-width: 3; transition: fill 0.6s, opacity 0.6s; cursor: pointer; }
+.pdca-seg.plan.active   { fill: var(--accent); }
+.pdca-seg.do.active     { fill: var(--success); }
+.pdca-seg.check.active  { fill: var(--warning); }
+.pdca-seg.act.active    { fill: var(--danger); }
+.pdca-label { font-family: var(--font-display); font-weight: 800; fill: #fff; font-size: 20px; pointer-events: none; }
+.pdca-center {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 150px; height: 150px; border-radius: 50%;
+  background: var(--bg); border: 1px solid var(--stroke);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+}
+.pdca-center .stage-name { font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; }
+.pdca-center .stage-idx { color: var(--text-45); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; }
+
+.pdca-info h3 { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.pdca-info .pill { display: inline-block; font-family: var(--font-display); font-weight: 700; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; margin-bottom: 1rem; }
+.pdca-info ul { list-style: none; display: flex; flex-direction: column; gap: 0.9rem; }
+.pdca-info li { display: flex; gap: 12px; align-items: flex-start; color: var(--text-70); }
+.pdca-info li .m { color: var(--accent); margin-top: 2px; }
+.pdca-info .pdca-actions { margin-top: 1.6rem; display: flex; gap: 12px; }
+.pdca-dots { display: flex; gap: 8px; margin-top: 1.2rem; }
+.pdca-dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--stroke-2); transition: all 0.4s; }
+.pdca-dots span.on { width: 26px; border-radius: 6px; background: var(--accent); }
+
+/* ---- 6g. Chapter 7 — Recovery workflow ---- */
+.workflow { display: flex; gap: 0; align-items: stretch; overflow-x: auto; padding-bottom: 1rem; }
+.wf-step {
+  flex: 1 0 auto; min-width: 150px;
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 0 0.6rem;
+}
+.wf-connector { position: relative; height: 3px; flex: 1; align-self: center; min-width: 26px; }
+.wf-connector .line { position: absolute; inset: 0; background: var(--stroke-2); border-radius: 3px; }
+.wf-connector .flow { position: absolute; inset: 0; width: 0%; background: linear-gradient(90deg, var(--accent), var(--success)); border-radius: 3px; transition: width 0.8s var(--ease); box-shadow: 0 0 10px rgba(0,120,255,0.6); }
+.wf-item { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; }
+.wf-orb {
+  width: 62px; height: 62px; border-radius: 50%;
+  background: var(--card-2); border: 2px solid var(--stroke-2);
+  display: flex; align-items: center; justify-content: center; color: var(--text-45);
+  transition: all 0.6s var(--ease); cursor: pointer;
+}
+.wf-orb.on { border-color: var(--accent); color: var(--accent); box-shadow: var(--glow-accent); transform: scale(1.06); }
+.wf-name { font-family: var(--font-display); font-weight: 700; font-size: 0.92rem; }
+.wf-detail {
+  margin-top: 2rem;
+  background: var(--card); border: 1px solid var(--stroke); border-radius: 16px;
+  padding: 1.8rem 2rem; min-height: 120px;
+  transition: opacity 0.4s;
+}
+.wf-detail h3 { color: var(--accent); font-size: 1.3rem; margin-bottom: 0.5rem; }
+.wf-detail p { color: var(--text-70); }
+
+/* ---- 6h. Chapter 8 — Dashboard ---- */
+.dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+.dash-card {
+  background: var(--card); border: 1px solid var(--stroke);
+  border-radius: 18px; padding: 1.8rem; cursor: pointer;
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease), border-color 0.4s;
+  position: relative; overflow: hidden;
+}
+.dash-card:hover { transform: translateY(-6px); border-color: rgba(0,120,255,0.4); box-shadow: 0 0 30px rgba(0,120,255,0.25); }
+.dash-card .d-icon { width: 54px; height: 54px; border-radius: 14px; background: rgba(0,120,255,0.12); color: var(--accent); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; border: 1px solid rgba(0,120,255,0.25); }
+.dash-card h3 { font-size: 1.25rem; margin-bottom: 0.4rem; }
+.dash-card .d-teaser { color: var(--text-45); font-size: 0.9rem; }
+.dash-card .d-cta { margin-top: 1.1rem; font-family: var(--font-display); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 6px; }
+
+/* Fullscreen dash panel */
+.dash-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(5,5,5,0.85); backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center; padding: 2rem;
+  opacity: 0; pointer-events: none; transition: opacity 0.45s;
+}
+.dash-overlay.open { opacity: 1; pointer-events: auto; }
+.dash-panel {
+  width: min(920px, 96%); max-height: 88vh; overflow-y: auto;
+  background: linear-gradient(160deg, #10233f 0%, var(--card) 60%);
+  border: 1px solid rgba(0,120,255,0.35); border-radius: 24px;
+  padding: 3rem; position: relative;
+  transform: translateY(30px) scale(0.97); transition: transform 0.5s var(--ease);
+}
+.dash-overlay.open .dash-panel { transform: none; }
+.dash-panel .p-icon { width: 70px; height: 70px; border-radius: 18px; background: rgba(0,120,255,0.15); color: var(--accent); display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem; }
+.dash-panel h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 1rem; }
+.dash-panel p.lead { color: var(--text-70); font-size: 1.1rem; margin-bottom: 1.6rem; }
+.dash-panel .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; }
+.dash-panel .fact { background: rgba(255,255,255,0.03); border: 1px solid var(--stroke); border-radius: 12px; padding: 1.1rem; }
+.dash-panel .fact .n { font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; color: var(--accent); }
+.dash-panel .fact .l { color: var(--text-70); font-size: 0.9rem; }
+
+/* ---- 6i. Chapter 9 — Lessons ---- */
+.lessons-intro { text-align: center; }
+.lessons-list { list-style: none; display: flex; flex-direction: column; gap: 1.1rem; max-width: 760px; margin: 2.4rem auto 0; }
+.lesson {
+  display: flex; gap: 18px; align-items: center;
+  background: var(--card); border: 1px solid var(--stroke); border-radius: 14px;
+  padding: 1.3rem 1.6rem;
+  opacity: 0; transform: translateY(24px) scale(0.98);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+.lesson.show { opacity: 1; transform: none; }
+.lesson .num {
+  flex: 0 0 46px; width: 46px; height: 46px; border-radius: 12px;
+  background: rgba(0,210,106,0.12); color: var(--success);
+  border: 1px solid rgba(0,210,106,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 800;
+}
+.lesson p { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; }
+
+/* ---- 6j. Chapter 10 — Ending ---- */
+.ending {
+  min-height: 100vh; position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 4rem 1.5rem;
+  background: radial-gradient(ellipse at center, #0b0b0b, #000);
+}
+.ending-lines { display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 3rem; }
+.ending-line {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(1.6rem, 4.5vw, 3rem);
+  opacity: 0; transform: translateY(20px); filter: blur(6px);
+  transition: opacity 1s var(--ease), transform 1s var(--ease), filter 1s var(--ease);
+}
+.ending-line.show { opacity: 1; transform: none; filter: blur(0); }
+.ending-line.accent { color: var(--accent); }
+.ending-logo { opacity: 0; transform: scale(0.9); transition: opacity 1.4s var(--ease), transform 1.4s var(--ease); }
+.ending-logo.show { opacity: 1; transform: none; }
+.ending-final {
+  max-width: 720px; margin-top: 1.6rem;
+  font-family: var(--font-display); font-weight: 600; font-size: clamp(1rem,2vw,1.3rem);
+  color: var(--text-70); line-height: 1.5;
+  opacity: 0; transition: opacity 1.4s var(--ease) 0.4s;
+}
+.ending-final.show { opacity: 1; }
+.ending-credits { margin-top: 3rem; color: var(--text-25); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0; transition: opacity 1s 1s; }
+.ending-credits.show { opacity: 1; }
+
+/* Animated counter styling */
+.counter { font-variant-numeric: tabular-nums; }
+
+/* ---- 6k. Chapter 1 compact overrides (fit within one screen) ---- */
+#chapter1 { padding-top: 5rem; padding-bottom: 3rem; min-height: 100vh; }
+#chapter1 .chapter-head { margin-bottom: 1.4rem; }
+#chapter1 .chapter-sub { margin-top: 0.6rem; font-size: 1rem; }
+#chapter1 .c1-grid { gap: 2.4rem; align-items: start; }
+#chapter1 .factory-silhouette { aspect-ratio: 16/9; }
+#chapter1 #revealIncidentBtn { margin-top: 1.1rem !important; padding: 0.8rem 1.6rem; }
+#chapter1 .incident-points { gap: 0.6rem; margin-top: 0; }
+#chapter1 .incident-points li { padding: 0.7rem 1rem; }
+#chapter1 .incident-points .txt strong { font-size: 0.98rem; }
+#chapter1 .incident-points .txt span { font-size: 0.85rem; line-height: 1.4; }
+#chapter1 .infected-grid { grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 1rem; }
+
+/* ---- 6b-2. Chapter 2 — scroll-driven sticky HORIZONTAL timeline ---- */
+.ch2 { position: relative; border-top: 1px solid rgba(255,255,255,0.04); }
+/* Tall driver: its scroll length controls how many events have appeared. */
+.ch2-driver { position: relative; height: 320vh; }
+.ch2-sticky {
+  position: sticky; top: 0;
+  height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 4rem 1.5rem;
+}
+.h-timeline { position: relative; margin-top: 2.4rem; }
+.h-line { position: absolute; left: 0; right: 0; top: 30px; height: 3px; background: var(--stroke-2); border-radius: 3px; }
+.h-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--success)); border-radius: 3px; box-shadow: 0 0 12px rgba(0,120,255,0.6); transition: width 0.5s var(--ease); }
+.h-track { position: relative; display: flex; gap: 1rem; }
+.he {
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  cursor: pointer;
+  opacity: 0; transform: translateY(26px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.he.show { opacity: 1; transform: none; }
+.he-node {
+  width: 62px; height: 62px; border-radius: 50%;
+  background: var(--card-2); border: 2px solid var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 800; font-size: 0.72rem; color: var(--accent);
+  box-shadow: 0 0 0 6px var(--bg); z-index: 2; transition: all 0.4s var(--ease);
+}
+.he.active .he-node { background: var(--accent); color: #fff; box-shadow: 0 0 0 6px var(--bg), 0 0 26px rgba(0,120,255,0.6); transform: scale(1.08); }
+.he-time { margin-top: 0.9rem; font-family: var(--font-display); font-weight: 700; color: var(--accent); font-size: 0.82rem; letter-spacing: 0.06em; }
+.he-title { font-family: var(--font-display); font-weight: 700; font-size: 0.98rem; margin-top: 0.2rem; line-height: 1.25; }
+.h-detail {
+  margin: 2rem auto 0; max-width: 720px;
+  background: var(--card); border: 1px solid var(--stroke); border-radius: 16px;
+  padding: 1.4rem 1.7rem; min-height: 96px;
+  transition: opacity 0.35s;
+}
+.h-detail h3 { color: var(--accent); font-size: 1.2rem; margin-bottom: 0.4rem; }
+.h-detail p { color: var(--text-70); }
+.h-scrollhint { text-align: center; margin-top: 1.6rem; color: var(--text-45); font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase; transition: opacity 0.4s; }
+
+/* ---- Generic modal (used by Chapter 5 role pop-ups) ---- */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 95;
+  background: rgba(5,5,5,0.82); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+  opacity: 0; pointer-events: none; transition: opacity 0.4s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal-card {
+  position: relative; width: min(560px, 96%);
+  background: linear-gradient(160deg, #10233f 0%, var(--card) 55%);
+  border: 1px solid rgba(0,120,255,0.35); border-radius: 20px;
+  padding: 2.2rem; box-shadow: var(--shadow-lift);
+  transform: translateY(24px) scale(0.96); transition: transform 0.5s var(--ease);
+}
+.modal-overlay.open .modal-card { transform: none; }
+.modal-card .dept { color: var(--accent); font-size: 0.74rem; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.4rem; }
+.modal-card h3 { font-size: 1.6rem; margin-bottom: 1.2rem; }
+.modal-card dl { display: grid; gap: 1rem; }
+.modal-card dt { font-family: var(--font-display); font-weight: 700; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-45); margin-bottom: 0.15rem; }
+.modal-card dd { color: var(--text-70); font-size: 0.98rem; }
+
+/* ---- 6l. Q&A / Knowledge Check ---- */
+.quiz-score {
+  text-align: center; margin: 0 auto 2.4rem;
+  font-family: var(--font-display); font-weight: 800; font-size: 1.05rem;
+  letter-spacing: 0.04em; color: var(--accent);
+}
+.quiz-score .bar { display: inline-block; width: 180px; height: 8px; border-radius: 6px; background: var(--card-2); vertical-align: middle; margin-left: 12px; overflow: hidden; border: 1px solid var(--stroke); }
+.quiz-score .bar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--success)); transition: width 0.6s var(--ease); }
+.quiz-list { display: flex; flex-direction: column; gap: 1.6rem; max-width: 820px; margin: 0 auto; }
+.quiz-q { background: var(--card); border: 1px solid var(--stroke); border-radius: 18px; padding: 1.7rem 1.9rem; box-shadow: var(--shadow-soft); }
+.quiz-q .q-num { font-family: var(--font-display); font-weight: 800; font-size: 0.74rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); }
+.quiz-q .q-text { font-family: var(--font-display); font-weight: 700; font-size: 1.22rem; margin: 0.4rem 0 1.2rem; line-height: 1.3; }
+.quiz-options { display: grid; gap: 0.7rem; }
+.quiz-opt {
+  display: flex; gap: 12px; align-items: center; text-align: left; width: 100%;
+  padding: 0.9rem 1.1rem; border: 1px solid var(--stroke); border-radius: 12px;
+  background: var(--card-2); color: var(--text); font-size: 0.98rem;
+  transition: border-color 0.25s, background 0.25s, transform 0.2s var(--ease);
+}
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); background: rgba(0,120,255,0.08); transform: translateX(3px); }
+.quiz-opt .marker {
+  flex: 0 0 30px; width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 800; font-size: 0.85rem;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--stroke); color: var(--text-70);
+  transition: all 0.25s;
+}
+.quiz-opt:disabled { cursor: default; }
+.quiz-opt.correct { border-color: var(--success); background: rgba(0,210,106,0.14); }
+.quiz-opt.correct .marker { background: var(--success); color: #04160c; border-color: var(--success); }
+.quiz-opt.wrong { border-color: var(--danger); background: rgba(255,77,77,0.12); }
+.quiz-opt.wrong .marker { background: var(--danger); color: #1a0505; border-color: var(--danger); }
+.quiz-opt.dim { opacity: 0.5; }
+.quiz-feedback { margin-top: 0.9rem; font-size: 0.9rem; color: var(--text-70); max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.45s var(--ease), opacity 0.45s, margin 0.45s; }
+.quiz-feedback.show { max-height: 140px; opacity: 1; }
+.quiz-feedback .tag { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.72rem; margin-right: 8px; }
+.quiz-feedback .tag.ok { color: var(--success); }
+.quiz-feedback .tag.no { color: var(--danger); }
+.quiz-result { text-align: center; margin: 2.6rem auto 0; max-width: 640px; font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; opacity: 0; transform: translateY(16px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+.quiz-result.show { opacity: 1; transform: none; }
+
+/* ---- 7. Responsive ---- */
+@media (max-width: 980px) {
+  .c1-grid, .pdca-layout { grid-template-columns: 1fr; gap: 2rem; }
+  .flip-grid { grid-template-columns: repeat(2, 1fr); }
+  .dash-grid { grid-template-columns: repeat(2, 1fr); }
+  .infected-grid { grid-template-columns: repeat(4, 1fr); }
+  #chapter1 .infected-grid { grid-template-columns: repeat(8, 1fr); }
+  .chapter-rail { display: none; }
+  .hero-card { grid-template-columns: 1fr; }
+  .hero-card .cell { border-right: none; border-bottom: 1px solid var(--stroke); }
+  .hero-card .cell:last-child { border-bottom: none; }
+  /* Horizontal timeline: shrink nodes so all events still fit side by side */
+  .he-node { width: 48px; height: 48px; font-size: 0.62rem; }
+  .h-line { top: 23px; }
+  .he-title { font-size: 0.82rem; }
+  .he-time { font-size: 0.72rem; margin-top: 0.6rem; }
+  .h-track { gap: 0.5rem; }
+  .ch2-sticky { padding: 3rem 1rem; }
+}
+@media (max-width: 620px) {
+  .flip-grid { grid-template-columns: 1fr; }
+  .dash-grid { grid-template-columns: 1fr; }
+  .flip { height: 300px; }
+  .chapter { padding: 5rem 1.2rem; }
+  .watermark .brand-name { display: none; }
+  .dash-panel { padding: 1.8rem; }
+}
+
+/* ---- 8. Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+  .reveal, .incident-points li, .tl-event, .he, .lesson, .ending-line, .ending-logo, .quiz-result { opacity: 1 !important; transform: none !important; filter: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================ FIXED CHROME ============================ -->
+<div class="progress-top" id="progressTop"></div>
+
+<div class="watermark" aria-hidden="true">
+  <!-- Norsk Hydro logo -->
+  <img src="https://companieslogo.com/img/orig/NHY.OL_BIG.D-f55ac361.png?t=1720244493" alt="Norsk Hydro" height="30" style="height:30px;width:auto;display:block;" />
+</div>
+
+<nav class="chapter-rail" id="chapterRail" aria-label="Chapter navigation"></nav>
+
+<!-- ============================ HERO ============================ -->
+<header class="hero" id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-scanlines"></div>
+  <div class="hero-sweep"></div>
+  <div class="hero-vignette"></div>
+
+  <div class="hero-inner">
+    <div class="hero-logo">
+      <!-- Norsk Hydro logo -->
+      <img src="https://companieslogo.com/img/orig/NHY.OL_BIG.D-f55ac361.png?t=1720244493" alt="Norsk Hydro" style="height:70px;width:auto;display:block;" />
+    </div>
+
+    <h1>Norsk Hydro</h1>
+    <div class="subtitle">LockerGoga Ransomware Attack</div>
+    <div class="tagline">Group4 - CSEC-751: Business Continuity in Action</div>
+
+ 
+
+    <div class="hero-cta">
+      <button class="btn" data-scroll-to="chapter1">
+        Begin Investigation
+        <span class="arrow">↓</span>
+      </button>
+    </div>
+  </div>
+
+ 
+</header>
+
+<!-- ============================ CHAPTER 1 — THE INCIDENT ============================ -->
+<section class="chapter" id="chapter1" data-rail="The Incident">
+  <div class="chapter-wrap">
+    <div class="chapter-head reveal">
+      <span class="chapter-num">Chapter 01</span>
+      <h2 class="chapter-question">What happened on March&nbsp;19, 2019?</h2>
+      <p class="chapter-sub">In the pre-dawn hours, a silent intruder began locking the digital heart of a global manufacturer. Reveal the incident.</p>
+    </div>
+
+    <div class="c1-grid">
+      <div class="reveal">
+        <div class="factory-silhouette" id="factorySil">
+          <svg viewBox="0 0 400 300" class="blur-layer" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <linearGradient id="fgrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#1a2230"/><stop offset="1" stop-color="#05070a"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="300" fill="url(#fgrad)"/>
+            <!-- factory silhouette -->
+            <g fill="#0b0f16">
+              <rect x="30" y="170" width="90" height="110"/>
+              <rect x="130" y="140" width="120" height="140"/>
+              <rect x="260" y="120" width="110" height="160"/>
+              <polygon points="30,170 75,140 120,170"/>
+              <rect x="70" y="90" width="16" height="85"/>
+              <rect x="300" y="60" width="20" height="65"/>
+            </g>
+            <!-- windows glowing -->
+            <g fill="#0078FF" opacity="0.5">
+              <rect x="150" y="160" width="14" height="14"/><rect x="180" y="160" width="14" height="14"/>
+              <rect x="210" y="160" width="14" height="14"/><rect x="150" y="190" width="14" height="14"/>
+              <rect x="180" y="190" width="14" height="14"/><rect x="280" y="150" width="14" height="14"/>
+              <rect x="310" y="150" width="14" height="14"/><rect x="340" y="150" width="14" height="14"/>
+            </g>
+            <!-- smoke -->
+            <circle cx="78" cy="80" r="10" fill="#141a24" opacity="0.6"/>
+            <circle cx="86" cy="66" r="14" fill="#141a24" opacity="0.5"/>
+          </svg>
+          <div class="redline"></div>
+          <div class="factory-tag mono">CAM_04 · 03:00 CET · SIGNAL LOST</div>
+        </div>
+        <button class="btn" id="revealIncidentBtn" style="margin-top:1.6rem;">
+          Reveal Incident <span class="arrow">→</span>
+        </button>
+      </div>
+
+      <div class="reveal d2">
+        <ul class="incident-points" id="incidentPoints">
+          <li><span class="dot">●</span><span class="txt"><strong>LockerGoga ransomware detected</strong><span>Malware silently propagated across the corporate network overnight.</span></span></li>
+          <li><span class="dot">●</span><span class="txt"><strong>Thousands of systems encrypted</strong><span>Files across ~22,000 devices in 40 countries were locked.</span></span></li>
+          <li><span class="dot">●</span><span class="txt"><strong>Production disrupted</strong><span>Automated production lines lost their control systems.</span></span></li>
+          <li><span class="dot">●</span><span class="txt"><strong>Global operations affected</strong><span>170+ plants and 35,000 employees felt the impact.</span></span></li>
+        </ul>
+
+        <div class="infected-grid" id="infectedGrid">
+          <!-- computers populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CHAPTER 2 — TIMELINE (scroll-driven, sticky, horizontal) ============================ -->
+<section class="ch2" id="chapter2" data-rail="Attack Timeline">
+  <!-- The tall driver provides the scroll distance that reveals events one by one. -->
+  <div class="ch2-driver" id="ch2Driver">
+    <div class="ch2-sticky">
+      <div class="chapter-wrap">
+        <div class="chapter-head reveal">
+          <span class="chapter-num">Chapter 02</span>
+          <h2 class="chapter-question">How did the crisis unfold?</h2>
+          <p class="chapter-sub">Keep scrolling — the attack reveals itself minute by minute. Click any event to expand what happened behind the scenes.</p>
+        </div>
+
+        <div class="h-timeline">
+          <div class="h-line"><div class="h-fill" id="hFill"></div></div>
+          <div class="h-track" id="hTrack">
+            <!-- events populated by JS -->
+          </div>
+        </div>
+
+        <div class="h-detail" id="hDetail">
+          <h3>Ransomware detected</h3>
+          <p>Scroll to reveal each moment of the attack, then click an event above for the full story.</p>
+        </div>
+
+        <div class="h-scrollhint" id="hScrollHint">↓ Scroll to reveal the timeline</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CHAPTER 3 — INCIDENT RESPONSE ============================ -->
+<section class="chapter" id="chapter3" data-rail="Incident Response">
+  <div class="chapter-wrap">
+    <div class="chapter-head reveal">
+      <span class="chapter-num">Chapter 03</span>
+      <h2 class="chapter-question">How did Hydro respond?</h2>
+      <p class="chapter-sub">Four pillars defined the response. Click a card to flip it and read how each was executed under pressure.</p>
+    </div>
+
+    <div class="flip-grid" id="flipGrid">
+      <!-- flip cards populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CHAPTER 4 — BUSINESS CONTINUITY ============================ -->
+<section class="chapter" id="chapter4" data-rail="Business Continuity">
+  <div class="chapter-wrap">
+    <div class="chapter-head reveal">
+      <span class="chapter-num">Chapter 04</span>
+      <h2 class="chapter-question">How did manufacturing continue?</h2>
+      <p class="chapter-sub">Explore the plant. Click a glowing hotspot to uncover the continuity measure that kept metal flowing. Close it before opening another.</p>
+    </div>
+
+    <div class="reveal d1">
+      <div class="factory-stage" id="factoryStage">
+        <img class="plant-img" src="facilities.png" alt="Hydro aluminum facility — Casting House, Primary Smelter, and IT Control Center" width="1536" height="1024" />
+
+        <!-- hotspots aligned to facilities.png landmarks -->
+        <button class="hotspot" style="left:22%; top:54%" data-hs="manual"><span class="hs-label">Manual Operations</span></button>
+        <button class="hotspot" style="left:50%; top:46%" data-hs="crisis"><span class="hs-label">Crisis Management</span></button>
+        <button class="hotspot" style="left:78%; top:52%" data-hs="backups"><span class="hs-label">Backups</span></button>
+        <button class="hotspot" style="left:86%; top:22%" data-hs="comms"><span class="hs-label">Stakeholder Comms</span></button>
+
+        <!-- floating panel -->
+        <div class="hs-panel" id="hsPanel">
+          <div class="panel-card">
+            <button class="panel-close" id="hsClose" aria-label="Close panel">✕</button>
+            <div class="p-icon" id="hsIcon"></div>
+            <h3 id="hsTitle">Title</h3>
+            <p id="hsText">Text</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CHAPTER 5 — CRISIS MANAGEMENT TEAM ============================ -->
+<section class="chapter" id="chapter5" data-rail="Crisis Team">
+  <div class="chapter-wrap">
+    <div class="chapter-head reveal">
+      <span class="chapter-num">Chapter 05</span>
+      <h2 class="chapter-question">How was crisis management organized?</h2>
+      <p class="chapter-sub">A clear chain of command turned chaos into coordination. Expand the organization, then click any role to open its mandate.</p>
+    </div>
+
+    <div class="reveal d1">
+      <div class="org" id="org"></div>
+      <p class="org-expand-hint" id="orgHint">Click the CEO to reveal the crisis organization →</p>
+    </div>
+  </div>
+
+  <!-- Role detail pop-up (opens on top of the screen when a role is clicked) -->
+  <div class="modal-overlay" id="orgModal">
+    <div class="modal-card">
+      <button class="panel-close" id="orgModalClose" aria-label="Close">✕</button>
+      <div class="dept" id="orgModalDept"></div>
+      <h3 id="orgModalRole"></h3>
+      <dl>
+        <div><dt>Responsibilities</dt><dd id="orgModalResp"></dd></div>
+        <div><dt>Decision-making role</dt><dd id="orgModalDecision"></dd></div>
+        <div><dt>Contribution during the incident</dt><dd id="orgModalContrib"></dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CHAPTER 6 — PDCA FRAMEWORK ============================ -->
+<section class="chapter" id="chapter6" data-rail="PDCA Framework">
+  <div class="chapter-wrap">
+    <div class="chapter-head reveal">
+      <span class="chapter-num">Chapter 06</span>
+      <h2 class="chapter-question">How does this map to continuous improvement?</h2>
+      <p class="chapter-sub">Hydro's recovery mirrors the PDCA cycle. Step through Plan, Do, Check, and Act — one phase lights up at a time.</p>
+    </div>
+
+    <div class="pdca-layout reveal d1">
+      <div class="pdca-wheel-wrap">
+        <div class="pdca-wheel">
+          <svg id="pdcaSvg" viewBox="0 0 200 200">
+            <!-- Four quadrant arcs. Paths generated to cover 90° each. -->
+            <path class="pdca-seg plan"  data-stage="0" d="M100,100 L100,10 A90,90 0 0,1 190,100 Z"/>
+            <path class="pdca-seg do"    data-stage="1" d="M100,100 L190,100 A90,90 0 0,1 100,190 Z"/>
+            <path class="pdca-seg check" data-stage="2" d="M100,100 L100,190 A90,90 0 0,1 10,100 Z"/>
+            <path class="pdca-seg act"   data-stage="3" d="M100,100 L10,100 A90,90 0 0,1 100,10 Z"/>
+            <text class="pdca-label" x="145" y="58" text-anchor="middle">P</text>
+            <text class="pdca-label" x="145" y="150" text-anchor="middle">D</text>
+            <text class="pdca-label" x="55" y="150" text-anchor="middle">C</text>
+            <text class="pdca-label" x="55" y="58" text-anchor="middle">A</text>
+          </svg>
+          <div class="pdca-center">
+            <div class="stage-idx" id="pdcaIdx">Stage 1 / 4</div>
+            <div class="stage-name" id="pdcaStage">PLAN</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pdca-info">
+        <span class="pill" id="pdcaPill">Plan</span>
+        <h3 id="pdcaHeading">Prepare & anticipate</h3>
+        <ul id="pdcaList"></ul>
+        <div class="pdca-dots" id="pdcaDots">
+          <span class="on"></span><span></span><span></span><span></span>
+        </div>
+        <div class="pdca-actions">
+          <button class="btn" id="pdcaNext">Next Phase <span class="arrow">→</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CHAPTER 7 — RECOVERY WORKFLOW ============================ -->
+<section class="chapter" id="chapter7" data-rail="Recovery Process">
+  <div class="chapter-wrap">
+    <div class="chapter-head reveal">
+      <span class="chapter-num">Chapter 07</span>
+      <h2 class="chapter-question">How did the company recover?</h2>
+      <p class="chapter-sub">Recovery followed a deliberate sequence. Watch the flow connect, then click any step to expand it.</p>
+    </div>
+
+    <div class="reveal d1">
+      <div class="workflow" id="workflow"></div>
+      <div class="wf-detail" id="wfDetail">
+        <h3>Detection</h3>
+        <p>Select a step above to reveal how Hydro navigated each phase of recovery.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CHAPTER 8 — CONTINUITY STRATEGIES DASHBOARD ============================ -->
+<section class="chapter" id="chapter8" data-rail="Continuity Strategies">
+  <div class="chapter-wrap">
+    <div class="chapter-head reveal">
+      <span class="chapter-num">Chapter 08</span>
+      <h2 class="chapter-question">What made continuity possible?</h2>
+      <p class="chapter-sub">Six strategies formed Hydro's resilience stack. Hover for a glow, click to expand any strategy full-screen.</p>
+    </div>
+
+    <div class="dash-grid reveal d1" id="dashGrid"></div>
+  </div>
+</section>
+
+<!-- Dashboard fullscreen overlay -->
+<div class="dash-overlay" id="dashOverlay">
+  <div class="dash-panel">
+    <button class="panel-close" id="dashClose" aria-label="Close">✕</button>
+    <div class="p-icon" id="dashIcon"></div>
+    <h2 id="dashTitle"></h2>
+    <p class="lead" id="dashLead"></p>
+    <div class="facts" id="dashFacts"></div>
+  </div>
+</div>
+
+<!-- ============================ CHAPTER 9 — LESSONS LEARNED ============================ -->
+<section class="chapter" id="chapter9" data-rail="Lessons Learned">
+  <div class="chapter-wrap">
+    <div class="chapter-head reveal" style="text-align:center; margin-left:auto; margin-right:auto;">
+      <span class="chapter-num" style="justify-content:center;">Chapter 09</span>
+      <h2 class="chapter-question">What lessons were learned?</h2>
+    </div>
+
+    <div class="lessons-intro reveal d1">
+      <p style="font-family:var(--font-display); font-weight:700; font-size:clamp(1.4rem,3.2vw,2.2rem);">Every cyber incident teaches something.</p>
+      <button class="btn" id="showLessonsBtn" style="margin-top:1.6rem;">Show Lessons <span class="arrow">↓</span></button>
+    </div>
+
+    <ul class="lessons-list" id="lessonsList"></ul>
+  </div>
+</section>
+
+<!-- ============================ KNOWLEDGE CHECK — Q&A ============================ -->
+<section class="chapter" id="quiz" data-rail="Knowledge Check">
+  <div class="chapter-wrap">
+    <div class="chapter-head reveal" style="text-align:center; margin-left:auto; margin-right:auto;">
+      <span class="chapter-num" style="justify-content:center;">Knowledge Check</span>
+      <h2 class="chapter-question">Did the story stick?</h2>
+      <p class="chapter-sub" style="margin:1rem auto 0;">Test your understanding of how Norsk Hydro responded to the LockerGoga attack. Pick the best answer for each question.</p>
+    </div>
+
+    <div class="quiz-score reveal d1" id="quizScore">
+      Score: <span id="quizScoreVal">0</span> / <span id="quizScoreTotal">0</span>
+      <span class="bar"><i id="quizBar"></i></span>
+    </div>
+
+    <div class="quiz-list reveal d1" id="quizList">
+      <!-- questions populated by JS -->
+    </div>
+
+    <div class="quiz-result" id="quizResult"></div>
+  </div>
+</section>
+
+<!-- ============================ CHAPTER 10 — FINAL SUMMARY ============================ -->
+<section class="ending" id="chapter10" data-rail="Final Summary">
+  <div class="ending-lines" id="endingLines">
+    <div class="ending-line">Cyberattacks are inevitable.</div>
+    <div class="ending-line">Business disruption doesn't have to be.</div>
+    <div class="ending-line accent">Preparation makes the difference.</div>
+  </div>
+
+  <div class="ending-logo" id="endingLogo">
+    <img src="https://companieslogo.com/img/orig/NHY.OL_BIG.D-f55ac361.png?t=1720244493" alt="Norsk Hydro" style="height:82px;width:auto;display:block;margin:0 auto;" />
+  </div>
+
+  <p class="ending-final" id="endingFinal">Business Continuity Works When It Is Planned, Tested, and Continuously Improved.</p>
+  <div class="ending-credits" id="endingCredits">Cybersecurity Policy &amp; Law · Case Study · Norsk Hydro 2019</div>
+</section>
+
+<script>
+/* =========================================================================
+   INTERACTION LOGIC — Vanilla JS, organised by concern.
+   ========================================================================= */
+(function () {
+  "use strict";
+
+  const $  = (s, ctx = document) => ctx.querySelector(s);
+  const $$ = (s, ctx = document) => Array.from(ctx.querySelectorAll(s));
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------------------------------------------------------------
+     A. Smooth scroll for CTA + chapter rail
+     --------------------------------------------------------------------- */
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-scroll-to]');
+    if (!t) return;
+    const target = document.getElementById(t.dataset.scrollTo);
+    if (target) target.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth' });
+  });
+
+  /* ---------------------------------------------------------------------
+     B. Top progress bar
+     --------------------------------------------------------------------- */
+  
+
+  /* ---------------------------------------------------------------------
+     C. Build chapter rail from sections with [data-rail]
+     --------------------------------------------------------------------- */
+  const rail = $('#chapterRail');
+  const chapters = $$('[data-rail]');
+  chapters.forEach((sec) => {
+    const dot = document.createElement('a');
+    dot.className = 'rail-dot';
+    dot.href = '#' + sec.id;
+    dot.dataset.label = sec.dataset.rail;
+    dot.setAttribute('aria-label', sec.dataset.rail);
+    rail.appendChild(dot);
+  });
+  const railDots = $$('.rail-dot', rail);
+
+  // Show rail after leaving hero; highlight active chapter
+  const hero = $('#hero');
+  const railVisObserver = new IntersectionObserver((entries) => {
+    entries.forEach((en) => rail.classList.toggle('visible', !en.isIntersecting));
+  }, { threshold: 0.4 });
+  railVisObserver.observe(hero);
+
+  // Activate the chapter whose body currently crosses the vertical centre of
+  // the viewport. Using a centre-line rootMargin keeps this robust even for the
+  // tall, scroll-driven Chapter 2 section (which can never fill 50% of the view).
+  const activeObserver = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (!en.isIntersecting) return;
+      const idx = chapters.indexOf(en.target);
+      railDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    });
+  }, { rootMargin: '-50% 0px -50% 0px', threshold: 0 });
+  chapters.forEach((c) => activeObserver.observe(c));
+
+  /* ---------------------------------------------------------------------
+     D. Generic reveal-on-scroll
+     --------------------------------------------------------------------- */
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (en.isIntersecting) { en.target.classList.add('in'); revealObserver.unobserve(en.target); }
+    });
+  }, { threshold: 0.18 });
+  $$('.reveal').forEach((el) => revealObserver.observe(el));
+
+  /* ---------------------------------------------------------------------
+     E. HERO — animated network / particle canvas
+     Draws floating nodes, connecting lines, and a faint world-map dot grid
+     with a subtle parallax reaction to the mouse.
+     --------------------------------------------------------------------- */
+  (function heroCanvas() {
+    const canvas = $('#hero-canvas');
+    const ctx = canvas.getContext('2d');
+    let w, h, dpr, nodes = [], mapDots = [], mouse = { x: 0.5, y: 0.5 };
+
+    // A very low-res world silhouette encoded as a bit grid (1 = land dot).
+    // Rough continents — purely decorative.
+    const MAP = [
+      "0000000000000000000000000000000000000000",
+      "0000011100000000000001111000000000000000",
+      "0001111111000000011111111111000000000000",
+      "0011111111100000111111111111100001100000",
+      "0011111111000001111111111111000011110000",
+      "0001111100000001111111111100000111111000",
+      "0000111000000000111111111000000111111100",
+      "0000011000000000011111100000000011111000",
+      "0000011000000000001111000000000001110000",
+      "0000001100000000000110000000000111100000",
+      "0000000110000000000010000000001111000000",
+      "0000000011000000000000000000000110000000",
+      "0000000001100000000000000000000000000000",
+    ];
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = canvas.clientWidth; h = canvas.clientHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      buildMap();
+    }
+
+    function buildMap() {
+      mapDots = [];
+      const cols = MAP[0].length, rows = MAP.length;
+      const cell = Math.min(w / cols, h / rows) * 0.9;
+      const offX = (w - cols * cell) / 2;
+      const offY = (h - rows * cell) / 2 - h * 0.02;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (MAP[r][c] === '1') mapDots.push({ x: offX + c * cell, y: offY + r * cell });
+        }
+      }
+    }
+
+    function initNodes() {
+      const count = Math.min(60, Math.floor(w / 22));
+      nodes = [];
+      for (let i = 0; i < count; i++) {
+        nodes.push({
+          x: Math.random() * w, y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25,
+          r: Math.random() * 1.6 + 0.6
+        });
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      const px = (mouse.x - 0.5) * 14, py = (mouse.y - 0.5) * 14; // parallax offset
+
+      // world map dots
+      for (const d of mapDots) {
+        ctx.beginPath();
+        ctx.arc(d.x + px * 0.4, d.y + py * 0.4, 1.4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,120,255,0.16)';
+        ctx.fill();
+      }
+
+      // network nodes + connections
+      for (const n of nodes) {
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > w) n.vx *= -1;
+        if (n.y < 0 || n.y > h) n.vy *= -1;
+      }
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        for (let j = i + 1; j < nodes.length; j++) {
+          const b = nodes[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < 150) {
+            ctx.beginPath();
+            ctx.moveTo(a.x + px, a.y + py);
+            ctx.lineTo(b.x + px, b.y + py);
+            ctx.strokeStyle = 'rgba(0,120,255,' + (0.18 * (1 - dist / 150)) + ')';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+        // glowing particle
+        ctx.beginPath();
+        ctx.arc(a.x + px, a.y + py, a.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(120,190,255,0.8)';
+        ctx.shadowColor = 'rgba(0,120,255,0.9)';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX / window.innerWidth;
+      mouse.y = e.clientY / window.innerHeight;
+    });
+    window.addEventListener('resize', () => { resize(); initNodes(); });
+
+    resize(); initNodes();
+    if (!prefersReduced) draw(); else { /* draw a single static frame */ draw.call(null); }
+  })();
+
+  /* ---------------------------------------------------------------------
+     F. CHAPTER 1 — reveal incident points + infected computers
+     --------------------------------------------------------------------- */
+  (function chapter1() {
+    const btn = $('#revealIncidentBtn');
+    const sil = $('#factorySil');
+    const points = $$('#incidentPoints li');
+    const grid = $('#infectedGrid');
+
+    // build 8 computer icons
+    const pcSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+    for (let i = 0; i < 8; i++) {
+      const pc = document.createElement('div');
+      pc.className = 'pc';
+      pc.style.color = '#3a4a5f';
+      pc.innerHTML = pcSvg + '<span class="lock">🔒</span>';
+      grid.appendChild(pc);
+    }
+    const pcs = $$('.pc', grid);
+
+    let done = false;
+    btn.addEventListener('click', () => {
+      if (done) return; done = true;
+      sil.classList.add('revealed');
+      btn.disabled = true; btn.style.opacity = '0.5'; btn.querySelector('.arrow').textContent = '✓';
+      btn.childNodes[0].textContent = 'Incident Revealed ';
+
+      // stagger the evidence points
+      points.forEach((li, i) => setTimeout(() => li.classList.add('show'), 350 + i * 550));
+      // stagger the infection spread
+      pcs.forEach((pc, i) => setTimeout(() => { pc.classList.add('infected'); pc.style.color = '#FF4D4D'; }, 500 + i * 220));
+    });
+  })();
+
+  /* ---------------------------------------------------------------------
+     G. CHAPTER 2 — scroll-driven, sticky, HORIZONTAL timeline.
+     The timeline stays pinned while the user scrolls through a tall driver;
+     scroll progress reveals each event one by one (no button needed).
+     Clicking a revealed event expands its detail in the panel below.
+     --------------------------------------------------------------------- */
+  (function chapter2() {
+    const data = [
+      { t: '08:00', title: 'Ransomware detected', detail: 'IT staff notice systems behaving strangely as files become inaccessible. LockerGoga has already spread through the Windows domain overnight.' },
+      { t: '08:30', title: 'IT isolates the network', detail: 'To halt propagation, IT disconnects affected systems and severs network links between plants and headquarters.' },
+      { t: '09:00', title: 'Factories disconnected', detail: 'Automated production control depends on IT. With systems locked, plants are cut off from central coordination.' },
+      { t: '10:00', title: 'Manual operations activated', detail: 'Veteran operators return to pen-and-paper procedures, running production lines by hand to keep aluminium flowing.' },
+      { t: '12:00', title: 'Crisis team mobilized', detail: 'A cross-functional crisis organization stands up: leadership, IT, operations, comms, legal and HR coordinate the response.' },
+      { t: 'Day 2+', title: 'Recovery begins', detail: 'Clean backups are validated and systems are rebuilt from the ground up, prioritising safe, verified restoration over speed.' }
+    ];
+
+    const driver = $('#ch2Driver');
+    const track = $('#hTrack');
+    const fill = $('#hFill');
+    const detail = $('#hDetail');
+    const hint = $('#hScrollHint');
+
+    // Build the horizontal event nodes
+    data.forEach((ev, i) => {
+      const el = document.createElement('div');
+      el.className = 'he';
+      el.dataset.i = i;
+      el.innerHTML =
+        '<div class="he-node mono">' + (i + 1) + '</div>' +
+        '<div class="he-time mono">' + ev.t + '</div>' +
+        '<div class="he-title">' + ev.title + '</div>';
+      track.appendChild(el);
+      el.addEventListener('click', () => { if (el.classList.contains('show')) showDetail(i); });
+    });
+    const nodes = $$('.he', track);
+    let revealed = 0;      // how many events are currently visible
+    let activeIdx = -1;    // which event's detail is shown
+
+    function showDetail(i) {
+      activeIdx = i;
+      nodes.forEach((n, k) => n.classList.toggle('active', k === i));
+      detail.style.opacity = '0';
+      setTimeout(() => {
+        detail.innerHTML = '<h3>' + data[i].title + '</h3><p>' + data[i].detail + '</p>';
+        detail.style.opacity = '1';
+      }, 160);
+    }
+
+    function setRevealed(count) {
+      count = Math.max(0, Math.min(data.length, count));
+      if (count === revealed) return;
+      revealed = count;
+      nodes.forEach((n, k) => n.classList.toggle('show', k < revealed));
+      fill.style.width = (revealed / data.length * 100) + '%';
+      // Auto-focus the latest revealed event's detail as it appears
+      if (revealed > 0) showDetail(revealed - 1);
+      hint.style.opacity = revealed >= data.length ? '0' : '1';
+    }
+
+    // Map scroll position within the tall driver → number of revealed events.
+    function onScroll() {
+      const rect = driver.getBoundingClientRect();
+      const scrollable = driver.offsetHeight - window.innerHeight;
+      const progress = scrollable > 0 ? Math.min(1, Math.max(0, -rect.top / scrollable)) : 0;
+      // First event appears almost immediately, last near the end.
+      setRevealed(Math.ceil(progress * data.length + 0.0001));
+    }
+
+    if (prefersReduced) {
+      setRevealed(data.length);
+    } else {
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      onScroll();
+    }
+  })();
+
+  /* ---------------------------------------------------------------------
+     H. CHAPTER 3 — flip cards (one open at a time)
+     --------------------------------------------------------------------- */
+  (function chapter3() {
+    const cards = [
+      { icon: 'shield', title: 'Containment', text: 'Networks were isolated immediately to stop LockerGoga from spreading further across the global domain.' },
+      { icon: 'search', title: 'Investigation', text: 'Forensic experts and national authorities were engaged to understand the malware, its entry point, and its scope.' },
+      { icon: 'megaphone', title: 'Communication', text: 'Hydro chose radical transparency — daily press updates, an open webcast, and honest status pages built public trust.' },
+      { icon: 'refresh', title: 'Recovery', text: 'Systems were rebuilt from clean, verified backups. Hydro refused to pay the ransom and restored on its own terms.' }
+    ];
+    const icons = {
+      shield:   '<svg viewBox="0 0 24 24" width="30" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/></svg>',
+      search:   '<svg viewBox="0 0 24 24" width="30" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>',
+      megaphone:'<svg viewBox="0 0 24 24" width="30" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1z"/><path d="M16 8a5 5 0 0 1 0 8"/></svg>',
+      refresh:  '<svg viewBox="0 0 24 24" width="30" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>'
+    };
+
+    const grid = $('#flipGrid');
+    cards.forEach((c) => {
+      const el = document.createElement('div');
+      el.className = 'flip';
+      el.innerHTML =
+        '<div class="flip-inner">' +
+          '<div class="flip-face flip-front">' +
+            '<div class="icon">' + icons[c.icon] + '</div>' +
+            '<h3>' + c.title + '</h3>' +
+            '<div class="hint">Click to reveal</div>' +
+          '</div>' +
+          '<div class="flip-face flip-back">' +
+            '<h3>' + c.title + '</h3>' +
+            '<p>' + c.text + '</p>' +
+            '<div class="back-hint">Click to flip back</div>' +
+          '</div>' +
+        '</div>';
+      grid.appendChild(el);
+    });
+    const flips = $$('.flip', grid);
+    flips.forEach((f) => f.addEventListener('click', () => {
+      const willOpen = !f.classList.contains('flipped');
+      flips.forEach((o) => o.classList.remove('flipped')); // only one at a time
+      if (willOpen) f.classList.add('flipped');
+    }));
+  })();
+
+  /* ---------------------------------------------------------------------
+     I. CHAPTER 4 — factory hotspots (one panel at a time)
+     --------------------------------------------------------------------- */
+  (function chapter4() {
+    const info = {
+      manual:  { icon: '🏭', title: 'Manual Operations', text: 'Where automation failed, experienced operators ran production lines manually — pouring molten aluminium using printed procedures and hard-won expertise.' },
+      crisis:  { icon: '🎯', title: 'Crisis Management', text: 'A dedicated crisis team coordinated every plant, making rapid, informed decisions and keeping the whole organization aligned on priorities.' },
+      backups: { icon: '💾', title: 'Backups', text: 'Reliable, isolated backups meant Hydro could rebuild from clean data rather than negotiate with attackers — a cornerstone of recovery.' },
+      comms:   { icon: '📢', title: 'Stakeholder Communication', text: 'Transparent updates to employees, investors, customers, and the public preserved trust even while systems were still down.' }
+    };
+    const panel = $('#hsPanel');
+    const closeBtn = $('#hsClose');
+    let open = false;
+
+    function openPanel(key) {
+      const d = info[key];
+      $('#hsIcon').textContent = d.icon;
+      $('#hsTitle').textContent = d.title;
+      $('#hsText').textContent = d.text;
+      panel.classList.add('open');
+      open = true;
+    }
+    function closePanel() { panel.classList.remove('open'); open = false; }
+
+    $$('.hotspot').forEach((hs) => hs.addEventListener('click', () => {
+      if (open) return; // must close before opening another
+      openPanel(hs.dataset.hs);
+    }));
+    closeBtn.addEventListener('click', closePanel);
+    panel.addEventListener('click', (e) => { if (e.target === panel) closePanel(); });
+  })();
+
+  /* ---------------------------------------------------------------------
+     J. CHAPTER 5 — org chart (progressive expansion + detail)
+     --------------------------------------------------------------------- */
+  (function chapter5() {
+    // level 0 = CEO, level 1 = the six departments
+    const ceo = {
+      dept: 'Executive Leadership', role: 'CEO & Crisis Director',
+      resp: 'Owns the overall crisis, sets priorities, and is the ultimate decision-maker.',
+      decision: 'Approved the no-ransom stance and full transparency strategy.',
+      contrib: 'Fronted public communications, projecting calm, honest leadership.'
+    };
+    const departments = [
+      { dept: 'IT', role: 'CISO / IT Response', resp: 'Contain the malware, protect clean systems, and lead technical recovery.', decision: 'Ordered network isolation and rebuild-from-backup approach.', contrib: 'Rebuilt 22,000+ devices from verified backups.' },
+      { dept: 'Operations', role: 'Plant & Production Leads', resp: 'Keep physical production safe and running.', decision: 'Switched plants to manual operating procedures.', contrib: 'Sustained aluminium output despite the IT blackout.' },
+      { dept: 'Communications', role: 'Head of Communications', resp: 'Manage internal and external messaging.', decision: 'Committed to daily, transparent public updates.', contrib: 'Turned an attack into a case study in trust.' },
+      { dept: 'Legal', role: 'General Counsel', resp: 'Handle regulatory, disclosure, and law-enforcement obligations.', decision: 'Coordinated reporting with authorities like the Norwegian NCSC.', contrib: 'Ensured compliant, defensible incident handling.' },
+      { dept: 'HR', role: 'Head of HR', resp: 'Support and coordinate 35,000 employees.', decision: 'Organised staffing for manual operations and shifts.', contrib: 'Kept the workforce informed, safe, and mobilised.' }
+    ];
+
+    const org = $('#org');
+    const hint = $('#orgHint');
+
+    // Modal elements
+    const modal = $('#orgModal');
+    const modalClose = $('#orgModalClose');
+    const mDept = $('#orgModalDept');
+    const mRole = $('#orgModalRole');
+    const mResp = $('#orgModalResp');
+    const mDecision = $('#orgModalDecision');
+    const mContrib = $('#orgModalContrib');
+
+    function openModal(d) {
+      mDept.textContent = d.dept;
+      mRole.textContent = d.role;
+      mResp.textContent = d.resp;
+      mDecision.textContent = d.decision;
+      mContrib.textContent = d.contrib;
+      modal.classList.add('open');
+    }
+    function closeModal() { modal.classList.remove('open'); }
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    // Build CEO node
+    const ceoLevel = document.createElement('div');
+    ceoLevel.className = 'org-level';
+    ceoLevel.appendChild(buildNode(ceo, 'ceo'));
+    org.appendChild(ceoLevel);
+
+    // Connector (hidden until expanded)
+    const connector = document.createElement('div');
+    connector.className = 'org-connector';
+    org.appendChild(connector);
+
+    // Departments container (hidden initially)
+    const depWrap = document.createElement('div');
+    depWrap.className = 'org-level org-hidden';
+    departments.forEach((d) => depWrap.appendChild(buildNode(d, '')));
+    org.appendChild(depWrap);
+
+    let expanded = false;
+    const ceoNode = $('.org-node.ceo', org);
+    ceoNode.addEventListener('click', () => {
+      // First click on the CEO expands the org; afterwards it opens the CEO pop-up.
+      if (!expanded) {
+        expanded = true;
+        connector.classList.add('on');
+        depWrap.classList.add('shown');
+        hint.textContent = 'Click any role to open its mandate';
+        return;
+      }
+      openModal(ceo);
+    });
+
+    function buildNode(d, extra) {
+      const node = document.createElement('div');
+      node.className = 'org-node ' + extra;
+      node.innerHTML =
+        '<div class="dept">' + d.dept + '</div>' +
+        '<div class="role">' + d.role + '</div>';
+      if (extra !== 'ceo') node.addEventListener('click', () => openModal(d));
+      return node;
+    }
+  })();
+
+  /* ---------------------------------------------------------------------
+     K. CHAPTER 6 — PDCA wheel rotation
+     --------------------------------------------------------------------- */
+  (function chapter6() {
+    const stages = [
+      { key: 'plan',  name: 'PLAN',  color: 'var(--accent)',  heading: 'Prepare & anticipate',
+        items: ['Business continuity & disaster-recovery plans existed before the attack.', 'Backups were maintained and isolated from production.', 'Roles for a crisis organization were defined in advance.'] },
+      { key: 'do',    name: 'DO',    color: 'var(--success)', heading: 'Execute the response',
+        items: ['Isolated the network to contain LockerGoga.', 'Activated manual production procedures at plants.', 'Stood up the crisis team and daily communications.'] },
+      { key: 'check', name: 'CHECK', color: 'var(--warning)', heading: 'Verify & assess',
+        items: ['Validated backups were clean before restoring.', 'Assessed the true scope across 40 countries.', 'Monitored recovery progress and reviewed decisions daily.'] },
+      { key: 'act',   name: 'ACT',   color: 'var(--danger)',  heading: 'Improve & harden',
+        items: ['Rebuilt infrastructure more securely than before.', 'Shared lessons openly to help other organizations.', 'Strengthened detection, segmentation, and BCP for the future.'] }
+    ];
+    const pillColors = { plan:'var(--accent)', do:'var(--success)', check:'var(--warning)', act:'var(--danger)' };
+
+    const svg = $('#pdcaSvg');
+    const segs = $$('.pdca-seg', svg);
+    const pill = $('#pdcaPill');
+    const heading = $('#pdcaHeading');
+    const list = $('#pdcaList');
+    const stageName = $('#pdcaStage');
+    const idxEl = $('#pdcaIdx');
+    const dots = $$('#pdcaDots span');
+    const nextBtn = $('#pdcaNext');
+    let cur = 0;
+
+    function render() {
+      const s = stages[cur];
+      // Wheel stays fixed in place — only the active quadrant is highlighted.
+      segs.forEach((seg) => seg.classList.toggle('active', +seg.dataset.stage === cur));
+      stageName.textContent = s.name;
+      idxEl.textContent = 'Stage ' + (cur + 1) + ' / 4';
+      pill.textContent = s.name;
+      pill.style.color = pillColors[s.key];
+      pill.style.background = 'color-mix(in srgb, ' + pillColors[s.key] + ' 16%, transparent)';
+      heading.textContent = s.heading;
+      list.innerHTML = s.items.map((it) => '<li><span class="m">▹</span><span>' + it + '</span></li>').join('');
+      dots.forEach((d, i) => d.classList.toggle('on', i === cur));
+    }
+    function advance() { cur = (cur + 1) % stages.length; render(); }
+
+    nextBtn.addEventListener('click', advance);
+    segs.forEach((seg) => seg.addEventListener('click', () => { cur = +seg.dataset.stage; render(); }));
+    render();
+  })();
+
+  /* ---------------------------------------------------------------------
+     L. CHAPTER 7 — recovery workflow (animated flow + expandable steps)
+     --------------------------------------------------------------------- */
+  (function chapter7() {
+    const steps = [
+      { name: 'Detection', icon: '🔍', text: 'The ransomware is identified early morning as systems lock up across the domain.' },
+      { name: 'Isolation', icon: '🛑', text: 'Networks are severed to contain the spread and protect unaffected systems.' },
+      { name: 'Manual Operations', icon: '🏭', text: 'Production continues by hand while IT systems remain offline — continuity in action.' },
+      { name: 'Recovery', icon: '♻️', text: 'Clean backups are validated and systems are progressively restored to service.' },
+      { name: 'Infrastructure Rebuild', icon: '🏗️', text: 'Hydro rebuilds its IT environment more securely, rather than simply patching the old one.' },
+      { name: 'Lessons Learned', icon: '💡', text: 'Findings are documented and shared openly, feeding continuous improvement.' }
+    ];
+
+    const wf = $('#workflow');
+    const detail = $('#wfDetail');
+
+    steps.forEach((s, i) => {
+      const item = document.createElement('div');
+      item.className = 'wf-step';
+      item.innerHTML =
+        '<div class="wf-item">' +
+          '<div class="wf-orb" data-i="' + i + '">' + s.icon + '</div>' +
+          '<div class="wf-name">' + s.name + '</div>' +
+        '</div>';
+      wf.appendChild(item);
+      if (i < steps.length - 1) {
+        const conn = document.createElement('div');
+        conn.className = 'wf-connector';
+        conn.innerHTML = '<span class="line"></span><span class="flow"></span>';
+        wf.appendChild(conn);
+      }
+    });
+
+    const orbs = $$('.wf-orb', wf);
+    const flows = $$('.wf-connector .flow', wf);
+
+    function selectStep(i) {
+      orbs.forEach((o, k) => o.classList.toggle('on', k <= i));
+      flows.forEach((f, k) => f.style.width = k < i ? '100%' : '0%');
+      detail.style.opacity = '0';
+      setTimeout(() => {
+        detail.innerHTML = '<h3>' + steps[i].name + '</h3><p>' + steps[i].text + '</p>';
+        detail.style.opacity = '1';
+      }, 180);
+    }
+    orbs.forEach((o) => o.addEventListener('click', () => selectStep(+o.dataset.i)));
+
+    // Animate the flow filling when the workflow enters view
+    const io = new IntersectionObserver((ents) => {
+      ents.forEach((en) => {
+        if (en.isIntersecting) {
+          let i = 0;
+          const step = () => {
+            orbs[i].classList.add('on');
+            if (i < flows.length) flows[i].style.width = '100%';
+            i++;
+            if (i < orbs.length) setTimeout(step, 380);
+            else selectStep(0); // reset detail to first and highlight
+          };
+          if (!prefersReduced) step(); else orbs.forEach((o)=>o.classList.add('on'));
+          io.disconnect();
+        }
+      });
+    }, { threshold: 0.4 });
+    io.observe(wf);
+  })();
+
+  /* ---------------------------------------------------------------------
+     M. CHAPTER 8 — continuity dashboard (hover glow + fullscreen panel)
+     --------------------------------------------------------------------- */
+  (function chapter8() {
+    const items = [
+      { icon: '🏭', title: 'Manual Production', teaser: 'Human expertise as a fallback system.',
+        lead: 'When IT went dark, people became the control system. Operators kept plants running with manual procedures.',
+        facts: [['170+', 'plants kept running'], ['0', 'safety incidents from manual mode'], ['24/7', 'continuous operation']] },
+      { icon: '💾', title: 'Backups', teaser: 'Clean data, no ransom required.',
+        lead: 'Isolated, tested backups let Hydro rebuild without paying attackers a single dollar.',
+        facts: [['22k+', 'devices restored'], ['€0', 'ransom paid'], ['100%', 'rebuild from backup']] },
+      { icon: '🛡️', title: 'Disaster Recovery', teaser: 'A plan ready before the crisis.',
+        lead: 'Pre-existing DR playbooks meant the team executed rather than improvised.',
+        facts: [['Pre-built', 'DR procedures'], ['Days', 'to core recovery'], ['Prioritised', 'safe restoration']] },
+      { icon: '🚨', title: 'Incident Response', teaser: 'Fast containment, clear roles.',
+        lead: 'A defined response structure enabled rapid isolation and coordinated action.',
+        facts: [['<1hr', 'to isolation'], ['6', 'departments engaged'], ['Authorities', 'looped in early']] },
+      { icon: '📢', title: 'Communication', teaser: 'Radical transparency builds trust.',
+        lead: 'Daily updates and open webcasts turned a crisis into a reputation win.',
+        facts: [['Daily', 'public updates'], ['Open', 'webcasts held'], ['+Trust', 'reputation gained']] },
+      { icon: '📈', title: 'Continuous Improvement', teaser: 'Every incident makes you stronger.',
+        lead: 'Lessons fed back into hardened infrastructure and better preparedness — the PDCA loop closing.',
+        facts: [['Rebuilt', 'more securely'], ['Shared', 'lessons publicly'], ['PDCA', 'loop completed']] }
+    ];
+
+    const grid = $('#dashGrid');
+    items.forEach((it, i) => {
+      const c = document.createElement('div');
+      c.className = 'dash-card';
+      c.dataset.i = i;
+      c.innerHTML =
+        '<div class="d-icon">' + it.icon + '</div>' +
+        '<h3>' + it.title + '</h3>' +
+        '<div class="d-teaser">' + it.teaser + '</div>' +
+        '<div class="d-cta">Expand <span>→</span></div>';
+      grid.appendChild(c);
+    });
+
+    const overlay = $('#dashOverlay');
+    const close = $('#dashClose');
+    grid.addEventListener('click', (e) => {
+      const card = e.target.closest('.dash-card');
+      if (!card) return;
+      const it = items[+card.dataset.i];
+      $('#dashIcon').textContent = it.icon;
+      $('#dashTitle').textContent = it.title;
+      $('#dashLead').textContent = it.lead;
+      $('#dashFacts').innerHTML = it.facts.map((f) =>
+        '<div class="fact"><div class="n">' + f[0] + '</div><div class="l">' + f[1] + '</div></div>').join('');
+      overlay.classList.add('open');
+    });
+    const closeOverlay = () => overlay.classList.remove('open');
+    close.addEventListener('click', closeOverlay);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeOverlay(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeOverlay(); });
+  })();
+
+  /* ---------------------------------------------------------------------
+     N. CHAPTER 9 — lessons revealed one by one
+     --------------------------------------------------------------------- */
+  (function chapter9() {
+    const lessons = [
+      'Never rely on a single recovery strategy.',
+      'Business continuity is more than technology.',
+      'Communication is critical during crises.',
+      'Recovery procedures must be tested.',
+      'Continuous improvement strengthens resilience.'
+    ];
+    const list = $('#lessonsList');
+    lessons.forEach((l, i) => {
+      const li = document.createElement('li');
+      li.className = 'lesson';
+      li.innerHTML = '<span class="num">' + (i + 1) + '</span><p>' + l + '</p>';
+      list.appendChild(li);
+    });
+    const items = $$('.lesson', list);
+    const btn = $('#showLessonsBtn');
+    let shown = false;
+    btn.addEventListener('click', () => {
+      if (shown) return; shown = true;
+      btn.disabled = true; btn.style.opacity = '0.5';
+      items.forEach((li, i) => setTimeout(() => li.classList.add('show'), i * 500));
+    });
+  })();
+
+  /* ---------------------------------------------------------------------
+     N2. KNOWLEDGE CHECK — multiple-choice quiz on Hydro's response
+     --------------------------------------------------------------------- */
+  (function quiz() {
+    const questions = [
+      {
+        q: 'Did Norsk Hydro pay the ransom demanded by the LockerGoga attackers?',
+        options: [
+          'Yes, to restore systems as quickly as possible',
+          'No — they restored operations from clean backups',
+          'They negotiated and paid a reduced amount',
+          'They paid only for the most critical servers'
+        ],
+        answer: 1,
+        why: 'Hydro refused to pay. Because it had isolated, verified backups, it rebuilt systems on its own terms instead of funding the attackers.'
+      },
+      {
+        q: 'How did Hydro keep aluminium production running while IT systems were down?',
+        options: [
+          'It shut down all plants until systems recovered',
+          'It outsourced production to competitors',
+          'It switched to manual operations run by experienced staff',
+          'It relied entirely on automated fail-over systems'
+        ],
+        answer: 2,
+        why: 'Veteran operators reverted to manual, pen-and-paper procedures, keeping production lines running — business continuity in action.'
+      },
+      {
+        q: 'What communication approach did Hydro take during the crisis?',
+        options: [
+          'Radical transparency, with daily public updates and webcasts',
+          'It denied that any incident had occurred',
+          'It stayed silent until everything was fully resolved',
+          'It informed only its major shareholders'
+        ],
+        answer: 0,
+        why: 'Hydro was praised for openness — frequent, honest updates and even open webcasts, which actually strengthened stakeholder trust.'
+      },
+      {
+        q: 'What was the single most important enabler of Hydro\u2019s recovery without paying?',
+        options: [
+          'A decryption key supplied by police',
+          'A large cyber-insurance payout',
+          'Clean, isolated, and tested backups',
+          'A third-party firm that paid the ransom for them'
+        ],
+        answer: 2,
+        why: 'Reliable backups that were isolated from the infected network let Hydro rebuild ~22,000 devices from trusted data.'
+      },
+      {
+        q: 'Hydro planned, responded, verified, then hardened its systems. Which continuous-improvement cycle does this match?',
+        options: [
+          'The Waterfall model',
+          'PDCA — Plan, Do, Check, Act',
+          'The OSI networking model',
+          'A SWOT analysis'
+        ],
+        answer: 1,
+        why: 'The response maps neatly onto PDCA: plans in place, executed response, verified recovery, and improvements that closed the loop.'
+      }
+    ];
+
+    const list = $('#quizList');
+    const scoreVal = $('#quizScoreVal');
+    const scoreTotal = $('#quizScoreTotal');
+    const bar = $('#quizBar');
+    const result = $('#quizResult');
+    const letters = ['A', 'B', 'C', 'D'];
+    let score = 0, answered = 0;
+    scoreTotal.textContent = questions.length;
+
+    questions.forEach((item, qi) => {
+      const q = document.createElement('div');
+      q.className = 'quiz-q';
+      q.innerHTML =
+        '<div class="q-num">Question ' + (qi + 1) + ' of ' + questions.length + '</div>' +
+        '<div class="q-text">' + item.q + '</div>' +
+        '<div class="quiz-options"></div>' +
+        '<div class="quiz-feedback"></div>';
+      const optsWrap = $('.quiz-options', q);
+      const feedback = $('.quiz-feedback', q);
+
+      item.options.forEach((opt, oi) => {
+        const b = document.createElement('button');
+        b.className = 'quiz-opt';
+        b.type = 'button';
+        b.innerHTML = '<span class="marker">' + letters[oi] + '</span><span>' + opt + '</span>';
+        b.addEventListener('click', () => handleAnswer(qi, oi, item, b, optsWrap, feedback));
+        optsWrap.appendChild(b);
+      });
+
+      list.appendChild(q);
+    });
+
+    function handleAnswer(qi, oi, item, btn, optsWrap, feedback) {
+      const buttons = $$('.quiz-opt', optsWrap);
+      if (buttons[0].disabled) return; // already answered this question
+
+      const correct = oi === item.answer;
+      buttons.forEach((b, i) => {
+        b.disabled = true;
+        if (i === item.answer) b.classList.add('correct');
+        else if (i === oi) b.classList.add('wrong');
+        else b.classList.add('dim');
+      });
+
+      feedback.innerHTML = correct
+        ? '<span class="tag ok">Correct</span>' + item.why
+        : '<span class="tag no">Not quite</span>' + item.why;
+      feedback.classList.add('show');
+
+      if (correct) score++;
+      answered++;
+      scoreVal.textContent = score;
+      bar.style.width = (answered / questions.length * 100) + '%';
+
+      if (answered === questions.length) {
+        let msg;
+        if (score === questions.length) msg = 'Perfect score — you clearly understand how preparation beats disruption.';
+        else if (score >= Math.ceil(questions.length * 0.6)) msg = 'Well done — you\u2019ve grasped the essentials of Hydro\u2019s response.';
+        else msg = 'Worth another look — scroll back through the chapters to sharpen your understanding.';
+        result.textContent = 'You scored ' + score + ' / ' + questions.length + '. ' + msg;
+        result.classList.add('show');
+      }
+    }
+  })();
+
+  /* ---------------------------------------------------------------------
+     O. CHAPTER 10 — cinematic ending
+     --------------------------------------------------------------------- */
+  (function chapter10() {
+    const lines = $$('#endingLines .ending-line');
+    const logo = $('#endingLogo');
+    const finalTxt = $('#endingFinal');
+    const credits = $('#endingCredits');
+
+    const io = new IntersectionObserver((ents) => {
+      ents.forEach((en) => {
+        if (!en.isIntersecting) return;
+        io.disconnect();
+        let delay = 400;
+        lines.forEach((ln) => { setTimeout(() => ln.classList.add('show'), delay); delay += 1400; });
+        setTimeout(() => logo.classList.add('show'), delay);
+        setTimeout(() => finalTxt.classList.add('show'), delay + 600);
+        setTimeout(() => credits.classList.add('show'), delay + 1200);
+      });
+    }, { threshold: 0.45 });
+    io.observe($('#chapter10'));
+  })();
+
+})();
+</script>
+</body>
+</html>
