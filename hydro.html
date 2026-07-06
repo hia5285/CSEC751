@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Norsk Hydro — LockerGoga Ransomware Attack (2019) · Interactive Case Study</title>
-<meta name="description" content="An interactive documentary case study of the 2019 Norsk Hydro LockerGoga ransomware attack: incident, response, business continuity, crisis management, recovery, and the PDCA continuous improvement cycle." />
+<title>Norsk Hydro: LockerGoga Ransomware Attack (2019) · Interactive Case Study</title>
+<meta name="description" content="An interactive documentary case study of Norsk Hydro and the 2019 LockerGoga ransomware attack: company background, incident, response, business continuity, crisis management, recovery, and lessons learned." />
 
 <style>
 /* =========================================================================
@@ -169,15 +169,17 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
 
 /* ---- 3. Fixed chrome ---- */
 
-/* Corner watermark logo */
+/* Corner watermark logo — hidden in hero & final summary, revealed between */
 .watermark {
   position: fixed;
   top: 22px; left: 26px;
   z-index: 60;
   display: flex; align-items: center; gap: 10px;
-  opacity: 0.85;
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 0.6s var(--ease);
 }
+.watermark.visible { opacity: 0.85; }
 .watermark .brand-name {
   font-family: var(--font-display);
   font-weight: 800;
@@ -371,14 +373,12 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
 .chapter-head { margin-bottom: 2.6rem; max-width: 780px; }
 .chapter-num {
   font-family: var(--font-display); font-weight: 800;
-  font-size: 0.85rem; letter-spacing: 0.3em;
+  font-size: 0.85rem; letter-spacing: 0.01em;
   color: var(--accent);
   display: inline-flex; align-items: center; gap: 12px;
   margin-bottom: 1rem;
 }
-.chapter-num::before {
-  content: ""; width: 34px; height: 2px; background: var(--accent); display: inline-block;
-}
+
 .chapter-question {
   font-size: clamp(1.9rem, 4.6vw, 3.4rem);
   line-height: 1.08;
@@ -401,7 +401,43 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   box-shadow: var(--shadow-soft);
 }
 
-/* ---- 6a. Chapter 1 — Incident ---- */
+/* ---- 6a. Chapter 1 — About Norsk Hydro ---- */
+.intro-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 3rem; align-items: start; }
+.intro-image {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--stroke);
+  aspect-ratio: 16/10;
+  box-shadow: var(--shadow-soft);
+  background: var(--card);
+}
+.intro-image img { width: 100%; height: 100%; object-fit: cover; }
+.intro-caption {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 1rem 1.2rem;
+  background: linear-gradient(transparent, rgba(0,0,0,0.85));
+  font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-45);
+}
+.intro-facts { list-style: none; display: flex; flex-direction: column; gap: 0.85rem; }
+.intro-fact {
+  padding: 1rem 1.2rem;
+  background: var(--card); border: 1px solid var(--stroke);
+  border-radius: 12px;
+}
+.intro-fact strong { display: block; font-family: var(--font-display); font-weight: 700; font-size: 1.02rem; margin-bottom: 0.2rem; }
+.intro-fact span { color: var(--text-70); font-size: 0.92rem; line-height: 1.5; }
+.intro-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2.2rem; }
+.intro-stat {
+  text-align: center; padding: 1.2rem 0.8rem;
+  background: var(--card); border: 1px solid var(--stroke); border-radius: 14px;
+}
+.intro-stat .num { font-family: var(--font-display); font-weight: 800; font-size: 1.75rem; color: var(--accent); line-height: 1; }
+.intro-stat .lbl { font-size: 0.8rem; color: var(--text-70); margin-top: 0.45rem; line-height: 1.35; }
+#chapter1 { padding-top: 5rem; padding-bottom: 4rem; }
+
+/* ---- 6a-2. Chapter 2 — Incident ---- */
 .c1-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 3rem; align-items: center; }
 
 .factory-silhouette {
@@ -772,18 +808,18 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
 /* Animated counter styling */
 .counter { font-variant-numeric: tabular-nums; }
 
-/* ---- 6k. Chapter 1 compact overrides (fit within one screen) ---- */
-#chapter1 { padding-top: 5rem; padding-bottom: 3rem; min-height: 100vh; }
-#chapter1 .chapter-head { margin-bottom: 1.4rem; }
-#chapter1 .chapter-sub { margin-top: 0.6rem; font-size: 1rem; }
-#chapter1 .c1-grid { gap: 2.4rem; align-items: start; }
-#chapter1 .factory-silhouette { aspect-ratio: 16/9; }
-#chapter1 #revealIncidentBtn { margin-top: 1.1rem !important; padding: 0.8rem 1.6rem; }
-#chapter1 .incident-points { gap: 0.6rem; margin-top: 0; }
-#chapter1 .incident-points li { padding: 0.7rem 1rem; }
-#chapter1 .incident-points .txt strong { font-size: 0.98rem; }
-#chapter1 .incident-points .txt span { font-size: 0.85rem; line-height: 1.4; }
-#chapter1 .infected-grid { grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 1rem; }
+/* ---- 6k. Chapter 2 compact overrides (fit within one screen) ---- */
+#chapter2 { padding-top: 5rem; padding-bottom: 3rem; min-height: 100vh; }
+#chapter2 .chapter-head { margin-bottom: 1.4rem; }
+#chapter2 .chapter-sub { margin-top: 0.6rem; font-size: 1rem; }
+#chapter2 .c1-grid { gap: 2.4rem; align-items: start; }
+#chapter2 .factory-silhouette { aspect-ratio: 16/9; }
+#chapter2 #revealIncidentBtn { margin-top: 1.1rem !important; padding: 0.8rem 1.6rem; }
+#chapter2 .incident-points { gap: 0.6rem; margin-top: 0; }
+#chapter2 .incident-points li { padding: 0.7rem 1rem; }
+#chapter2 .incident-points .txt strong { font-size: 0.98rem; }
+#chapter2 .incident-points .txt span { font-size: 0.85rem; line-height: 1.4; }
+#chapter2 .infected-grid { grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 1rem; }
 
 /* ---- 6b-2. Chapter 2 — scroll-driven sticky HORIZONTAL timeline ---- */
 .ch2 { position: relative; border-top: 1px solid rgba(255,255,255,0.04); }
@@ -896,7 +932,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   .flip-grid { grid-template-columns: repeat(2, 1fr); }
   .dash-grid { grid-template-columns: repeat(2, 1fr); }
   .infected-grid { grid-template-columns: repeat(4, 1fr); }
-  #chapter1 .infected-grid { grid-template-columns: repeat(8, 1fr); }
+  #chapter1 .intro-grid { grid-template-columns: 1fr; }
+  #chapter1 .intro-stats { grid-template-columns: 1fr; }
+  #chapter2 .infected-grid { grid-template-columns: repeat(8, 1fr); }
   .chapter-rail { display: none; }
   .hero-card { grid-template-columns: 1fr; }
   .hero-card .cell { border-right: none; border-bottom: 1px solid var(--stroke); }
@@ -958,7 +996,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
 
     <div class="hero-cta">
       <button class="btn" data-scroll-to="chapter1">
-        Begin Investigation
+        Explore the Case Study
         <span class="arrow">↓</span>
       </button>
     </div>
@@ -967,11 +1005,59 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
  
 </header>
 
-<!-- ============================ CHAPTER 1 — THE INCIDENT ============================ -->
-<section class="chapter" id="chapter1" data-rail="The Incident">
+<!-- ============================ CHAPTER 1 — ABOUT NORSK HYDRO ============================ -->
+<section class="chapter" id="chapter1" data-rail="About Norsk Hydro">
   <div class="chapter-wrap">
     <div class="chapter-head reveal">
       <span class="chapter-num">Chapter 01</span>
+      <h2 class="chapter-question">Who is Norsk Hydro?</h2>
+      <p class="chapter-sub">Before the attack of March 2019, Hydro was already one of the world's most integrated aluminum and renewable-energy companies, a global industrial giant rooted in Norway.</p>
+    </div>
+
+    <div class="intro-grid">
+      <div class="reveal">
+        <div class="intro-image">
+          <img src="https://www.alcircle.com/api/media/1602764177.80175_Norsk_Hydro_setting_up_two_new_divisions_in_Renewables_Growth_and_Batteries_0_0.jpg" alt="Norsk Hydro headquarters in Oslo, Norway" width="1280" height="960" loading="lazy" onerror="this.onerror=null;this.src='https://companieslogo.com/img/orig/NHY.OL_BIG.D-f55ac361.png?t=1720244493';this.style.objectFit='contain';this.style.padding='3rem';this.style.background='#0d0d0d';" />
+          <div class="intro-caption">Norsk Hydro · Oslo, Norway</div>
+        </div>
+      </div>
+
+      <div class="reveal d2">
+        <ul class="intro-facts">
+          <li class="intro-fact">
+            <strong>Global aluminum leader</strong>
+            <span>Founded in 1905, Norsk Hydro is one of the world's largest aluminum companies, operating in 40+ countries with roughly 35,000 employees across mining, smelting, and finished products.</span>
+          </li>
+          <li class="intro-fact">
+            <strong>Digitized industrial operations</strong>
+            <span>Hydro's plants run on networked control systems and real-time data, so A cyberattack can significantly disrupt production and require business continuity measures.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="intro-stats reveal d3">
+      <div class="intro-stat">
+        <div class="num mono">1905</div>
+        <div class="lbl">Year founded in Norway</div>
+      </div>
+      <div class="intro-stat">
+        <div class="num mono">40+</div>
+        <div class="lbl">Countries with operations</div>
+      </div>
+      <div class="intro-stat">
+        <div class="num mono">35K</div>
+        <div class="lbl">Employees worldwide</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CHAPTER 2 — THE INCIDENT ============================ -->
+<section class="chapter" id="chapter2" data-rail="The Incident">
+  <div class="chapter-wrap">
+    <div class="chapter-head reveal">
+      <span class="chapter-num">Chapter 02</span>
       <h2 class="chapter-question">What happened on March&nbsp;19, 2019?</h2>
       <p class="chapter-sub">In the pre-dawn hours, a silent intruder began locking the digital heart of a global manufacturer. Reveal the incident.</p>
     </div>
@@ -1019,7 +1105,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
           <li><span class="dot">●</span><span class="txt"><strong>LockerGoga ransomware detected</strong><span>Malware silently propagated across the corporate network overnight.</span></span></li>
           <li><span class="dot">●</span><span class="txt"><strong>Thousands of systems encrypted</strong><span>Files across ~22,000 devices in 40 countries were locked.</span></span></li>
           <li><span class="dot">●</span><span class="txt"><strong>Production disrupted</strong><span>Automated production lines lost their control systems.</span></span></li>
-          <li><span class="dot">●</span><span class="txt"><strong>Global operations affected</strong><span>170+ plants and 35,000 employees felt the impact.</span></span></li>
+          <li><span class="dot">●</span><span class="txt"><strong>Global operations affected</strong><span>170+ locations and 35,000 employees felt the impact.</span></span></li>
         </ul>
 
         <div class="infected-grid" id="infectedGrid">
@@ -1030,16 +1116,16 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   </div>
 </section>
 
-<!-- ============================ CHAPTER 2 — TIMELINE (scroll-driven, sticky, horizontal) ============================ -->
-<section class="ch2" id="chapter2" data-rail="Attack Timeline">
+<!-- ============================ CHAPTER 3 — TIMELINE (scroll-driven, sticky, horizontal) ============================ -->
+<section class="ch2" id="chapter3" data-rail="Attack Timeline">
   <!-- The tall driver provides the scroll distance that reveals events one by one. -->
   <div class="ch2-driver" id="ch2Driver">
     <div class="ch2-sticky">
       <div class="chapter-wrap">
         <div class="chapter-head reveal">
-          <span class="chapter-num">Chapter 02</span>
+          <span class="chapter-num">Chapter 03</span>
           <h2 class="chapter-question">How did the crisis unfold?</h2>
-          <p class="chapter-sub">Keep scrolling — the attack reveals itself minute by minute. Click any event to expand what happened behind the scenes.</p>
+          <p class="chapter-sub">Keep scrolling, and the attack reveals itself minute by minute. Click any event to expand what happened behind the scenes.</p>
         </div>
 
         <div class="h-timeline">
@@ -1060,11 +1146,11 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   </div>
 </section>
 
-<!-- ============================ CHAPTER 3 — INCIDENT RESPONSE ============================ -->
-<section class="chapter" id="chapter3" data-rail="Incident Response">
+<!-- ============================ CHAPTER 4 — INCIDENT RESPONSE ============================ -->
+<section class="chapter" id="chapter4" data-rail="Incident Response">
   <div class="chapter-wrap">
     <div class="chapter-head reveal">
-      <span class="chapter-num">Chapter 03</span>
+      <span class="chapter-num">Chapter 04</span>
       <h2 class="chapter-question">How did Hydro respond?</h2>
       <p class="chapter-sub">Four pillars defined the response. Click a card to flip it and read how each was executed under pressure.</p>
     </div>
@@ -1075,18 +1161,18 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   </div>
 </section>
 
-<!-- ============================ CHAPTER 4 — BUSINESS CONTINUITY ============================ -->
-<section class="chapter" id="chapter4" data-rail="Business Continuity">
+<!-- ============================ CHAPTER 5 — BUSINESS CONTINUITY ============================ -->
+<section class="chapter" id="chapter5" data-rail="Business Continuity">
   <div class="chapter-wrap">
     <div class="chapter-head reveal">
-      <span class="chapter-num">Chapter 04</span>
+      <span class="chapter-num">Chapter 05</span>
       <h2 class="chapter-question">How did manufacturing continue?</h2>
       <p class="chapter-sub">Explore the plant. Click a glowing hotspot to uncover the continuity measure that kept metal flowing. Close it before opening another.</p>
     </div>
 
     <div class="reveal d1">
       <div class="factory-stage" id="factoryStage">
-        <img class="plant-img" src="facilities.png" alt="Hydro aluminum facility — Casting House, Primary Smelter, and IT Control Center" width="1536" height="1024" />
+        <img class="plant-img" src="facilities.png" alt="Hydro aluminum facility: Casting House, Primary Smelter, and IT Control Center" width="1536" height="1024" />
 
         <!-- hotspots aligned to facilities.png landmarks -->
         <button class="hotspot" style="left:22%; top:54%" data-hs="manual"><span class="hs-label">Manual Operations</span></button>
@@ -1108,11 +1194,11 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   </div>
 </section>
 
-<!-- ============================ CHAPTER 5 — CRISIS MANAGEMENT TEAM ============================ -->
-<section class="chapter" id="chapter5" data-rail="Crisis Team">
+<!-- ============================ CHAPTER 6 — CRISIS MANAGEMENT TEAM ============================ -->
+<section class="chapter" id="chapter6" data-rail="Crisis Team">
   <div class="chapter-wrap">
     <div class="chapter-head reveal">
-      <span class="chapter-num">Chapter 05</span>
+      <span class="chapter-num">Chapter 06</span>
       <h2 class="chapter-question">How was crisis management organized?</h2>
       <p class="chapter-sub">A clear chain of command turned chaos into coordination. Expand the organization, then click any role to open its mandate.</p>
     </div>
@@ -1138,13 +1224,13 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   </div>
 </section>
 
-<!-- ============================ CHAPTER 6 — PDCA FRAMEWORK ============================ -->
-<section class="chapter" id="chapter6" data-rail="PDCA Framework">
+<!-- ============================ CHAPTER 7 — PDCA FRAMEWORK ============================ -->
+<section class="chapter" id="chapter7" data-rail="PDCA Framework">
   <div class="chapter-wrap">
     <div class="chapter-head reveal">
-      <span class="chapter-num">Chapter 06</span>
+      <span class="chapter-num">Chapter 07</span>
       <h2 class="chapter-question">How does this map to continuous improvement?</h2>
-      <p class="chapter-sub">Hydro's recovery mirrors the PDCA cycle. Step through Plan, Do, Check, and Act — one phase lights up at a time.</p>
+      <p class="chapter-sub">Hydro's recovery mirrors the PDCA cycle. Step through Plan, Do, Check, and Act, and one phase lights up at a time.</p>
     </div>
 
     <div class="pdca-layout reveal d1">
@@ -1183,11 +1269,11 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   </div>
 </section>
 
-<!-- ============================ CHAPTER 7 — RECOVERY WORKFLOW ============================ -->
-<section class="chapter" id="chapter7" data-rail="Recovery Process">
+<!-- ============================ CHAPTER 8 — RECOVERY WORKFLOW ============================ -->
+<section class="chapter" id="chapter8" data-rail="Recovery Process">
   <div class="chapter-wrap">
     <div class="chapter-head reveal">
-      <span class="chapter-num">Chapter 07</span>
+      <span class="chapter-num">Chapter 08</span>
       <h2 class="chapter-question">How did the company recover?</h2>
       <p class="chapter-sub">Recovery followed a deliberate sequence. Watch the flow connect, then click any step to expand it.</p>
     </div>
@@ -1202,11 +1288,11 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   </div>
 </section>
 
-<!-- ============================ CHAPTER 8 — CONTINUITY STRATEGIES DASHBOARD ============================ -->
-<section class="chapter" id="chapter8" data-rail="Continuity Strategies">
+<!-- ============================ CHAPTER 9 — CONTINUITY STRATEGIES DASHBOARD ============================ -->
+<section class="chapter" id="chapter9" data-rail="Continuity Strategies">
   <div class="chapter-wrap">
     <div class="chapter-head reveal">
-      <span class="chapter-num">Chapter 08</span>
+      <span class="chapter-num">Chapter 09</span>
       <h2 class="chapter-question">What made continuity possible?</h2>
       <p class="chapter-sub">Six strategies formed Hydro's resilience stack. Hover for a glow, click to expand any strategy full-screen.</p>
     </div>
@@ -1226,11 +1312,11 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   </div>
 </div>
 
-<!-- ============================ CHAPTER 9 — LESSONS LEARNED ============================ -->
-<section class="chapter" id="chapter9" data-rail="Lessons Learned">
+<!-- ============================ CHAPTER 10 — LESSONS LEARNED ============================ -->
+<section class="chapter" id="chapter10" data-rail="Lessons Learned">
   <div class="chapter-wrap">
     <div class="chapter-head reveal" style="text-align:center; margin-left:auto; margin-right:auto;">
-      <span class="chapter-num" style="justify-content:center;">Chapter 09</span>
+      <span class="chapter-num" style="justify-content:center;">Chapter 10</span>
       <h2 class="chapter-question">What lessons were learned?</h2>
     </div>
 
@@ -1265,12 +1351,12 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   </div>
 </section>
 
-<!-- ============================ CHAPTER 10 — FINAL SUMMARY ============================ -->
-<section class="ending" id="chapter10" data-rail="Final Summary">
+<!-- ============================ CHAPTER 11 — FINAL SUMMARY ============================ -->
+<section class="ending" id="chapter11" data-rail="Final Summary">
   <div class="ending-lines" id="endingLines">
     <div class="ending-line">Cyberattacks are inevitable.</div>
     <div class="ending-line">Business disruption doesn't have to be.</div>
-    <div class="ending-line accent">Preparation makes the difference.</div>
+    <div class="ending-line">Preparation makes the difference.</div>
   </div>
 
   <div class="ending-logo" id="endingLogo">
@@ -1322,16 +1408,37 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   });
   const railDots = $$('.rail-dot', rail);
 
-  // Show rail after leaving hero; highlight active chapter
+  // Show rail & corner logo after leaving hero; hide logo again in final summary
   const hero = $('#hero');
+  const watermark = $('.watermark');
+  const ending = $('#chapter11');
+  let pastHero = false;
+  let inEnding = false;
+
+  function updateWatermark() {
+    watermark.classList.toggle('visible', pastHero && !inEnding);
+  }
+
   const railVisObserver = new IntersectionObserver((entries) => {
-    entries.forEach((en) => rail.classList.toggle('visible', !en.isIntersecting));
+    entries.forEach((en) => {
+      pastHero = !en.isIntersecting;
+      rail.classList.toggle('visible', pastHero);
+      updateWatermark();
+    });
   }, { threshold: 0.4 });
   railVisObserver.observe(hero);
 
+  const endingWatermarkObserver = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      inEnding = en.isIntersecting;
+      updateWatermark();
+    });
+  }, { threshold: 0.4 });
+  endingWatermarkObserver.observe(ending);
+
   // Activate the chapter whose body currently crosses the vertical centre of
   // the viewport. Using a centre-line rootMargin keeps this robust even for the
-  // tall, scroll-driven Chapter 2 section (which can never fill 50% of the view).
+  // tall, scroll-driven Chapter 3 section (which can never fill 50% of the view).
   const activeObserver = new IntersectionObserver((entries) => {
     entries.forEach((en) => {
       if (!en.isIntersecting) return;
@@ -1468,9 +1575,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   })();
 
   /* ---------------------------------------------------------------------
-     F. CHAPTER 1 — reveal incident points + infected computers
+     F. CHAPTER 2 — reveal incident points + infected computers
      --------------------------------------------------------------------- */
-  (function chapter1() {
+  (function chapter2Incident() {
     const btn = $('#revealIncidentBtn');
     const sil = $('#factorySil');
     const points = $$('#incidentPoints li');
@@ -1502,18 +1609,18 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   })();
 
   /* ---------------------------------------------------------------------
-     G. CHAPTER 2 — scroll-driven, sticky, HORIZONTAL timeline.
+     G. CHAPTER 3 — scroll-driven, sticky, HORIZONTAL timeline.
      The timeline stays pinned while the user scrolls through a tall driver;
      scroll progress reveals each event one by one (no button needed).
      Clicking a revealed event expands its detail in the panel below.
      --------------------------------------------------------------------- */
-  (function chapter2() {
+  (function chapter3Timeline() {
     const data = [
-      { t: '08:00', title: 'Ransomware detected', detail: 'IT staff notice systems behaving strangely as files become inaccessible. LockerGoga has already spread through the Windows domain overnight.' },
-      { t: '08:30', title: 'IT isolates the network', detail: 'To halt propagation, IT disconnects affected systems and severs network links between plants and headquarters.' },
-      { t: '09:00', title: 'Factories disconnected', detail: 'Automated production control depends on IT. With systems locked, plants are cut off from central coordination.' },
-      { t: '10:00', title: 'Manual operations activated', detail: 'Veteran operators return to pen-and-paper procedures, running production lines by hand to keep aluminium flowing.' },
-      { t: '12:00', title: 'Crisis team mobilized', detail: 'A cross-functional crisis organization stands up: leadership, IT, operations, comms, legal and HR coordinate the response.' },
+      { t: 'Early morning', title: 'Ransomware detected', detail: 'IT staff notice systems behaving strangely as files become inaccessible. LockerGoga has already spread through the Windows domain overnight.' },
+      { t: 'Later that morning', title: 'IT isolates the network', detail: 'To halt propagation, IT disconnects affected systems and severs network links between plants and headquarters.' },
+      { t: 'Mid-morning', title: 'Factories disconnected', detail: 'Automated production control depends on IT. With systems locked, plants are cut off from central coordination.' },
+      { t: 'Afternoon', title: 'Manual operations activated', detail: 'Veteran operators return to pen-and-paper procedures, running production lines by hand to keep aluminium flowing.' },
+      { t: 'Late afternoon', title: 'Crisis team mobilized', detail: 'A cross-functional crisis organization stands up: leadership, IT, operations, comms, legal and HR coordinate the response.' },
       { t: 'Day 2+', title: 'Recovery begins', detail: 'Clean backups are validated and systems are rebuilt from the ground up, prioritising safe, verified restoration over speed.' }
     ];
 
@@ -1579,13 +1686,13 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   })();
 
   /* ---------------------------------------------------------------------
-     H. CHAPTER 3 — flip cards (one open at a time)
+     H. CHAPTER 4 — flip cards (one open at a time)
      --------------------------------------------------------------------- */
-  (function chapter3() {
+  (function chapter4FlipCards() {
     const cards = [
       { icon: 'shield', title: 'Containment', text: 'Networks were isolated immediately to stop LockerGoga from spreading further across the global domain.' },
       { icon: 'search', title: 'Investigation', text: 'Forensic experts and national authorities were engaged to understand the malware, its entry point, and its scope.' },
-      { icon: 'megaphone', title: 'Communication', text: 'Hydro chose radical transparency — daily press updates, an open webcast, and honest status pages built public trust.' },
+      { icon: 'megaphone', title: 'Communication', text: 'Hydro chose radical transparency: daily press updates, an open webcast, and honest status pages built public trust.' },
       { icon: 'refresh', title: 'Recovery', text: 'Systems were rebuilt from clean, verified backups. Hydro refused to pay the ransom and restored on its own terms.' }
     ];
     const icons = {
@@ -1623,13 +1730,13 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   })();
 
   /* ---------------------------------------------------------------------
-     I. CHAPTER 4 — factory hotspots (one panel at a time)
+     I. CHAPTER 5 — factory hotspots (one panel at a time)
      --------------------------------------------------------------------- */
-  (function chapter4() {
+  (function chapter5Factory() {
     const info = {
-      manual:  { icon: '🏭', title: 'Manual Operations', text: 'Where automation failed, experienced operators ran production lines manually — pouring molten aluminium using printed procedures and hard-won expertise.' },
+      manual:  { icon: '🏭', title: 'Manual Operations', text: 'Where automation failed, experienced operators ran production lines manually, pouring molten aluminium using printed procedures and hard-won expertise.' },
       crisis:  { icon: '🎯', title: 'Crisis Management', text: 'A dedicated crisis team coordinated every plant, making rapid, informed decisions and keeping the whole organization aligned on priorities.' },
-      backups: { icon: '💾', title: 'Backups', text: 'Reliable, isolated backups meant Hydro could rebuild from clean data rather than negotiate with attackers — a cornerstone of recovery.' },
+      backups: { icon: '💾', title: 'Backups', text: 'Reliable, verified clean backups meant Hydro could rebuild from clean data rather than negotiate with attackers, a cornerstone of recovery.' },
       comms:   { icon: '📢', title: 'Stakeholder Communication', text: 'Transparent updates to employees, investors, customers, and the public preserved trust even while systems were still down.' }
     };
     const panel = $('#hsPanel');
@@ -1655,9 +1762,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   })();
 
   /* ---------------------------------------------------------------------
-     J. CHAPTER 5 — org chart (progressive expansion + detail)
+     J. CHAPTER 6 — org chart (progressive expansion + detail)
      --------------------------------------------------------------------- */
-  (function chapter5() {
+  (function chapter6Org() {
     // level 0 = CEO, level 1 = the six departments
     const ceo = {
       dept: 'Executive Leadership', role: 'CEO & Crisis Director',
@@ -1741,9 +1848,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   })();
 
   /* ---------------------------------------------------------------------
-     K. CHAPTER 6 — PDCA wheel rotation
+     K. CHAPTER 7 — PDCA wheel rotation
      --------------------------------------------------------------------- */
-  (function chapter6() {
+  (function chapter7Pdca() {
     const stages = [
       { key: 'plan',  name: 'PLAN',  color: 'var(--accent)',  heading: 'Prepare & anticipate',
         items: ['Business continuity & disaster-recovery plans existed before the attack.', 'Backups were maintained and isolated from production.', 'Roles for a crisis organization were defined in advance.'] },
@@ -1788,13 +1895,13 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   })();
 
   /* ---------------------------------------------------------------------
-     L. CHAPTER 7 — recovery workflow (animated flow + expandable steps)
+     L. CHAPTER 8 — recovery workflow (animated flow + expandable steps)
      --------------------------------------------------------------------- */
-  (function chapter7() {
+  (function chapter8Recovery() {
     const steps = [
       { name: 'Detection', icon: '🔍', text: 'The ransomware is identified early morning as systems lock up across the domain.' },
       { name: 'Isolation', icon: '🛑', text: 'Networks are severed to contain the spread and protect unaffected systems.' },
-      { name: 'Manual Operations', icon: '🏭', text: 'Production continues by hand while IT systems remain offline — continuity in action.' },
+      { name: 'Manual Operations', icon: '🏭', text: 'Production continues by hand while IT systems remain offline, continuity in action.' },
       { name: 'Recovery', icon: '♻️', text: 'Clean backups are validated and systems are progressively restored to service.' },
       { name: 'Infrastructure Rebuild', icon: '🏗️', text: 'Hydro rebuilds its IT environment more securely, rather than simply patching the old one.' },
       { name: 'Lessons Learned', icon: '💡', text: 'Findings are documented and shared openly, feeding continuous improvement.' }
@@ -1855,9 +1962,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   })();
 
   /* ---------------------------------------------------------------------
-     M. CHAPTER 8 — continuity dashboard (hover glow + fullscreen panel)
+     M. CHAPTER 9 — continuity dashboard (hover glow + fullscreen panel)
      --------------------------------------------------------------------- */
-  (function chapter8() {
+  (function chapter9Dashboard() {
     const items = [
       { icon: '🏭', title: 'Manual Production', teaser: 'Human expertise as a fallback system.',
         lead: 'When IT went dark, people became the control system. Operators kept plants running with manual procedures.',
@@ -1875,7 +1982,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
         lead: 'Daily updates and open webcasts turned a crisis into a reputation win.',
         facts: [['Daily', 'public updates'], ['Open', 'webcasts held'], ['+Trust', 'reputation gained']] },
       { icon: '📈', title: 'Continuous Improvement', teaser: 'Every incident makes you stronger.',
-        lead: 'Lessons fed back into hardened infrastructure and better preparedness — the PDCA loop closing.',
+        lead: 'Lessons fed back into hardened infrastructure and better preparedness, closing the PDCA loop.',
         facts: [['Rebuilt', 'more securely'], ['Shared', 'lessons publicly'], ['PDCA', 'loop completed']] }
     ];
 
@@ -1912,9 +2019,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   })();
 
   /* ---------------------------------------------------------------------
-     N. CHAPTER 9 — lessons revealed one by one
+     N. CHAPTER 10 — lessons revealed one by one
      --------------------------------------------------------------------- */
-  (function chapter9() {
+  (function chapter10Lessons() {
     const lessons = [
       'Never rely on a single recovery strategy.',
       'Business continuity is more than technology.',
@@ -1948,7 +2055,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
         q: 'Did Norsk Hydro pay the ransom demanded by the LockerGoga attackers?',
         options: [
           'Yes, to restore systems as quickly as possible',
-          'No — they restored operations from clean backups',
+          'No, they restored operations from clean backups',
           'They negotiated and paid a reduced amount',
           'They paid only for the most critical servers'
         ],
@@ -1964,7 +2071,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
           'It relied entirely on automated fail-over systems'
         ],
         answer: 2,
-        why: 'Veteran operators reverted to manual, pen-and-paper procedures, keeping production lines running — business continuity in action.'
+        why: 'Veteran operators reverted to manual, pen-and-paper procedures, keeping production lines running, business continuity in action.'
       },
       {
         q: 'What communication approach did Hydro take during the crisis?',
@@ -1975,7 +2082,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
           'It informed only its major shareholders'
         ],
         answer: 0,
-        why: 'Hydro was praised for openness — frequent, honest updates and even open webcasts, which actually strengthened stakeholder trust.'
+        why: 'Hydro was praised for openness: frequent, honest updates and even open webcasts, which actually strengthened stakeholder trust.'
       },
       {
         q: 'What was the single most important enabler of Hydro\u2019s recovery without paying?',
@@ -1992,7 +2099,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
         q: 'Hydro planned, responded, verified, then hardened its systems. Which continuous-improvement cycle does this match?',
         options: [
           'The Waterfall model',
-          'PDCA — Plan, Do, Check, Act',
+          'PDCA: Plan, Do, Check, Act',
           'The OSI networking model',
           'A SWOT analysis'
         ],
@@ -2057,9 +2164,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
 
       if (answered === questions.length) {
         let msg;
-        if (score === questions.length) msg = 'Perfect score — you clearly understand how preparation beats disruption.';
-        else if (score >= Math.ceil(questions.length * 0.6)) msg = 'Well done — you\u2019ve grasped the essentials of Hydro\u2019s response.';
-        else msg = 'Worth another look — scroll back through the chapters to sharpen your understanding.';
+        if (score === questions.length) msg = 'Perfect score. You clearly understand how preparation beats disruption.';
+        else if (score >= Math.ceil(questions.length * 0.6)) msg = 'Well done. You\u2019ve grasped the essentials of Hydro\u2019s response.';
+        else msg = 'Worth another look. Scroll back through the chapters to sharpen your understanding.';
         result.textContent = 'You scored ' + score + ' / ' + questions.length + '. ' + msg;
         result.classList.add('show');
       }
@@ -2067,9 +2174,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
   })();
 
   /* ---------------------------------------------------------------------
-     O. CHAPTER 10 — cinematic ending
+     O. CHAPTER 11 — cinematic ending
      --------------------------------------------------------------------- */
-  (function chapter10() {
+  (function chapter11Ending() {
     const lines = $$('#endingLines .ending-line');
     const logo = $('#endingLogo');
     const finalTxt = $('#endingFinal');
@@ -2086,7 +2193,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height
         setTimeout(() => credits.classList.add('show'), delay + 1200);
       });
     }, { threshold: 0.45 });
-    io.observe($('#chapter10'));
+    io.observe($('#chapter11'));
   })();
 
 })();
